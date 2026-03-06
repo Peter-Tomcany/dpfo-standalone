@@ -306,12 +306,12 @@
             <span class="field-note">Hrubý príjem vrátane nepeňažných</span>
           </div>
           <div class="field">
-            <label>ZP zrazené zamestnancom (€) – Príl.4 r.13</label>
+            <label>ZP zrazené zamestnancom (€) – Príl.4 r.10</label>
             <input type="number" id="p5_1_zp" value="0" min="0" step="0.01" oninput="calc5()">
             <span class="field-note">Zdravotné poistenie zrazené zo mzdy</span>
           </div>
           <div class="field">
-            <label>SP zrazené zamestnancom (€) – Príl.4 r.12</label>
+            <label>SP zrazené zamestnancom (€) – Príl.4 r.09</label>
             <input type="number" id="p5_1_sp" value="0" min="0" step="0.01" oninput="calc5()">
             <span class="field-note">Sociálne poistenie zrazené zo mzdy</span>
           </div>
@@ -326,7 +326,7 @@
         <div class="grid grid-2" style="margin-bottom:16px">
           <div class="field">
             <label>Druh príjmu</label>
-            <select id="p5_1_druh">
+            <select id="p5_1_druh" onchange="calc5()">
               <option value="zam">Pracovný pomer (HPP/DPP/DPC)</option>
               <option value="dohoda">Dohoda o vykonaní práce / pracovnej činnosti</option>
               <option value="konatel">Konateľ / člen org. zložky</option>
@@ -355,12 +355,12 @@
             <input type="number" id="p5_2_prijmy" value="0" min="0" step="0.01" oninput="calc5()">
           </div>
           <div class="field">
-            <label>ZP zrazené zamestnancom (€) – Príl.4 r.13</label>
+            <label>ZP zrazené zamestnancom (€) – Príl.4 r.10</label>
             <input type="number" id="p5_2_zp" value="0" min="0" step="0.01" oninput="calc5()">
             <span class="field-note">Zdravotné poistenie zrazené zo mzdy</span>
           </div>
           <div class="field">
-            <label>SP zrazené zamestnancom (€) – Príl.4 r.12</label>
+            <label>SP zrazené zamestnancom (€) – Príl.4 r.09</label>
             <input type="number" id="p5_2_sp" value="0" min="0" step="0.01" oninput="calc5()">
             <span class="field-note">Sociálne poistenie zrazené zo mzdy</span>
           </div>
@@ -369,6 +369,22 @@
           <div class="field">
             <label>Preddavky na daň zrazené (€)</label>
             <input type="number" id="p5_2_preddavky" value="0" min="0" step="0.01" oninput="calc5()">
+          </div>
+          <div class="field">
+            <label>Druh príjmu</label>
+            <select id="p5_2_druh" onchange="calc5()">
+              <option value="zam">Pracovný pomer (HPP/DPP/DPC)</option>
+              <option value="dohoda">Dohoda o vykonaní práce / pracovnej činnosti</option>
+              <option value="konatel">Konateľ / člen org. zložky</option>
+              <option value="ine">Iné §5</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Ročné zúčtovanie vykonané zamestnávateľom?</label>
+            <div class="radio-group">
+              <label class="radio-opt"><input type="radio" name="zuctovanie2" value="nie" checked> Nie</label>
+              <label class="radio-opt"><input type="radio" name="zuctovanie2" value="ano"> Áno</label>
+            </div>
           </div>
         </div>
 
@@ -484,10 +500,9 @@
         <hr class="divider">
         <div class="grid grid-2" style="margin-bottom:16px">
           <div class="field">
-            <label>Príspevky III. pilier / DDS 2025 (€) – r.75</label>
-            <input type="number" id="iii_pilier" value="0" min="0" step="0.01" oninput="validateDDS(); calc()">
-            <span class="field-note">Príspevky na celoeurópsky osobný dôchodkový produkt a príspevky na doplnkové dôchodkové sporenie (§ 11 ods. 8). Max. odpočet: 180 €</span>
-            <div id="dds_warn" style="display:none;margin-top:4px;padding:6px 10px;background:#fff3cd;border:1px solid #ffc107;border-radius:6px;font-size:12px;color:#856404;">⚠️ Maximálna výška odpočtu je 180 €. Suma bola automaticky znížená na 180 €.</div>
+            <label>Príspevky III. pilier 2025 (€)</label>
+            <input type="number" id="iii_pilier" value="0" min="0" max="180" step="0.01" oninput="calc()">
+            <span class="field-note">Max. odpočet: 180 €</span>
           </div>
           <div class="field">
             <label>NČZD na manžel/ku (€) – r.31</label>
@@ -670,14 +685,18 @@
         </div>
         <div id="asig_vysledok" style="margin-top:8px;"></div>
 
-        <div id="asig_par50_box" style="margin-top:12px;padding:12px 14px;border-radius:8px;display:flex;align-items:center;gap:10px;cursor:pointer;transition:background .2s,border-color .2s;" onclick="toggleAsigPar50()">
-          <input type="checkbox" id="asig_check_par50" checked style="width:18px;height:18px;accent-color:#321941;pointer-events:none;">
-          <label id="asig_label_par50" style="font-size:13px;margin:0;cursor:pointer;"></label>
+        <div id="asig_neuplatnujem_box" style="margin-top:12px;padding:10px 14px;background:#f0faf0;border:1px solid #b8dfc8;border-radius:8px;display:flex;align-items:center;gap:10px;">
+          <input type="checkbox" id="asig_check_neupl" checked disabled style="width:16px;height:16px;accent-color:#321941;">
+          <label style="font-size:13px;color:#2a5c3a;margin:0;">neuplatňujem postup podľa <strong>§ 50 zákona</strong> (r.151 – bez asignácie)</label>
+        </div>
+        <div id="asig_uplatnujem_box" style="display:none;margin-top:12px;padding:10px 14px;background:#f7f6f9;border:1px solid #d4c8e8;border-radius:8px;display:flex;align-items:center;gap:10px;">
+          <input type="checkbox" checked disabled style="width:16px;height:16px;accent-color:#321941;">
+          <label style="font-size:13px;color:#321941;margin:0;">uplatňujem postup podľa <strong>§ 50 zákona</strong> – asignácia bude v XML (r.151 + r.152)</label>
         </div>
 
-        <div id="asig_par50aa_box" style="margin-top:10px;padding:12px 14px;border-radius:8px;display:flex;align-items:center;gap:10px;cursor:pointer;transition:background .2s,border-color .2s;" onclick="toggleAsigPar50aa()">
-          <input type="checkbox" id="asig_check_par50aa" checked style="width:18px;height:18px;accent-color:#321941;pointer-events:none;">
-          <label id="asig_label_par50aa" style="font-size:13px;margin:0;cursor:pointer;"></label>
+        <div style="margin-top:10px;padding:10px 14px;background:#f0f0fa;border:1px solid #c8c8e8;border-radius:8px;display:flex;align-items:center;gap:10px;">
+          <input type="checkbox" checked disabled style="width:16px;height:16px;accent-color:#321941;">
+          <label style="font-size:13px;color:#3a3a6a;margin:0;">neuplatňujem postup podľa <strong>§ 50aa zákona</strong> (r.153 – poukázanie dane rodičom)</label>
         </div>
       </div>
     </div>
@@ -802,12 +821,15 @@ function calcBonus() {
 function calc5() {
   const p1 = v('p5_1_prijmy'), zp1 = v('p5_1_zp'), sp1 = v('p5_1_sp'), pred1 = v('p5_1_preddavky');
   const p2 = v('p5_2_prijmy'), zp2 = v('p5_2_zp'), sp2 = v('p5_2_sp'), pred2 = v('p5_2_preddavky');
+  const druh1 = document.getElementById('p5_1_druh')?.value || 'zam';
+  const druh2 = document.getElementById('p5_2_druh')?.value || 'zam';
   const celk_p5 = p1 + p2;
   const celk_zp5 = zp1 + zp2;
   const celk_sp5 = sp1 + sp2;
   const celk_poi5 = celk_zp5 + celk_sp5;
   const celk_pred5 = pred1 + pred2;
   const czd_5 = Math.max(0, celk_p5 - celk_poi5);
+  const r36a_val = (druh1 === 'dohoda' ? p1 : 0) + (druh2 === 'dohoda' ? p2 : 0);
 
   C.celk_p5 = celk_p5;
   C.celk_zp5 = celk_zp5;
@@ -815,30 +837,19 @@ function calc5() {
   C.celk_poi5 = celk_poi5;
   C.celk_pred5 = celk_pred5;
   C.czd_5 = czd_5;
+  C.r36a = r36a_val;
 
   const el = document.getElementById('vysledok_par5');
   if(el) el.innerHTML = `
     <div class="computed-row"><span class="computed-label">Príjmy §5 spolu (r.36)</span><span class="computed-value">${fmt(celk_p5)}</span></div>
-    <div class="computed-row"><span class="computed-label">ZP zrazené §5 (Príl.4 r.13)</span><span class="computed-value">${fmt(celk_zp5)}</span></div>
-    <div class="computed-row"><span class="computed-label">SP zrazené §5 (Príl.4 r.12)</span><span class="computed-value">${fmt(celk_sp5)}</span></div>
-    <div class="computed-row"><span class="computed-label">Povinné poistné celkom (r.37)</span><span class="computed-value">${fmt(celk_poi5)}</span></div>
+    ${r36a_val > 0 ? `<div class="computed-row"><span class="computed-label">z toho dohody (r.36a)</span><span class="computed-value">${fmt(r36a_val)}</span></div>` : ''}
+    <div class="computed-row"><span class="computed-label">SP zrazené §5 (Príl.4 r.09)</span><span class="computed-value">${fmt(celk_sp5)}</span></div>
+    <div class="computed-row"><span class="computed-label">ZP zrazené §5 (Príl.4 r.10)</span><span class="computed-value">${fmt(celk_zp5)}</span></div>
+    <div class="computed-row"><span class="computed-label">Povinné poistné celkom (r.37 / Príl.4 r.08)</span><span class="computed-value">${fmt(celk_poi5)}</span></div>
     <div class="computed-row"><span class="computed-label">Preddavky zrazené (r.39)</span><span class="computed-value">${fmt(celk_pred5)}</span></div>
     <div class="computed-row"><span class="computed-label">ČZD §5 (r.38)</span><span class="computed-value highlight">${fmt(czd_5)}</span></div>
   `;
   calc();
-}
-
-// ——— DDS VALIDATION ———
-function validateDDS() {
-  const el = document.getElementById('iii_pilier');
-  const warn = document.getElementById('dds_warn');
-  const val = parseFloat(el.value) || 0;
-  if(val > 180) {
-    el.value = 180;
-    if(warn) warn.style.display = 'block';
-  } else {
-    if(warn) warn.style.display = 'none';
-  }
 }
 
 // ——— MAIN CALC ———
@@ -944,8 +955,9 @@ function calc() {
     <div class="computed-row"><span class="computed-label">Príjmy §6 spolu (r.10)</span><span class="computed-value">${fmt(celk_prijmy_6)}</span></div>
     <div class="computed-row"><span class="computed-label">Výdavky §6 (paušál + odvody)</span><span class="computed-value">${fmt(celk_vydavky_6)}</span></div>
     <div class="computed-row"><span class="computed-label">ČZD §6 (r.55)</span><span class="computed-value highlight">${fmt(czd_6)}</span></div>
-    <div class="computed-row"><span class="computed-label">Príl.č.4 r.08 – povinné poistné SP+ZP</span><span class="computed-value">${fmt(zdravotne + socialne)}</span></div>
-    <div class="computed-row"><span class="computed-label">Príl.č.4 r.14 – preddavky ZP</span><span class="computed-value">${fmt(zdravotne_pred)}</span></div>
+    <div class="computed-row"><span class="computed-label">Príl.č.4 r.11 – SP zaplatené (§6)</span><span class="computed-value">${fmt(socialne)}</span></div>
+    <div class="computed-row"><span class="computed-label">Príl.č.4 r.13 – ZP zaplatené (§6)</span><span class="computed-value">${fmt(zdravotne)}</span></div>
+    <div class="computed-row"><span class="computed-label">Príl.č.4 r.14 – preddavky ZP (§6)</span><span class="computed-value">${fmt(zdravotne_pred)}</span></div>
   `;
 
   // Live feedback on odpočty page
@@ -973,7 +985,8 @@ function buildSummary() {
   t.innerHTML = `
     <tr class="section-sep"><td colspan="3">Príjmy zo závislej činnosti §5</td></tr>
     <tr><td>r.36</td><td>Príjmy §5 brutto spolu</td><td>${fmt(C.celk_p5)}</td></tr>
-    <tr><td>r.37</td><td>Povinné poistné (ZP+SP) zrazené</td><td>${fmt(C.celk_poi5)}</td></tr>
+    ${(C.r36a||0) > 0 ? `<tr><td>r.36a</td><td>z toho dohody</td><td>${fmt(C.r36a)}</td></tr>` : ''}
+    <tr><td>r.37</td><td>Povinné poistné (ZP+SP) zrazené – Príl.4 r.08</td><td>${fmt(C.celk_poi5)}</td></tr>
     <tr><td>r.38</td><td>ČZD §5</td><td>${fmt(C.czd_5)}</td></tr>
     <tr><td>r.39</td><td>Zrazené preddavky na daň</td><td>${fmt(C.celk_pred5)}</td></tr>
     <tr class="section-sep"><td colspan="3">Príjmy z podnikania §6</td></tr>
@@ -981,9 +994,9 @@ function buildSummary() {
     <tr><td>r.03</td><td>Príjmy iná SZČO (§6 ods.2)</td><td>${fmt(C.p_ina)}</td></tr>
     <tr><td>r.10</td><td>Príjmy §6 spolu</td><td>${fmt(C.celk_prijmy_6)}</td></tr>
     <tr><td></td><td>Výdavky (paušál 60%)</td><td>${fmt(C.vydavky_zivnost+C.vydavky_ina)}</td></tr>
-    <tr><td>r.11</td><td>Sociálne poistenie</td><td>${fmt(C.socialne)}</td></tr>
-    <tr><td>r.13</td><td>Zdravotné poistenie (celkom)</td><td>${fmt(C.zdravotne)}</td></tr>
-    <tr><td>r.14</td><td>ZP – preddavky</td><td>${fmt(C.zdravotne_pred || 0)}</td></tr>
+    <tr><td>Príl.4 r.11</td><td>Sociálne poistenie §6</td><td>${fmt(C.socialne)}</td></tr>
+    <tr><td>Príl.4 r.13</td><td>Zdravotné poistenie §6 (celkom)</td><td>${fmt(C.zdravotne)}</td></tr>
+    <tr><td>Príl.4 r.14</td><td>ZP §6 – preddavky</td><td>${fmt(C.zdravotne_pred || 0)}</td></tr>
     <tr><td>r.55</td><td>ČZD §6</td><td>${fmt(C.czd_6)}</td></tr>
     <tr class="section-sep"><td colspan="3">Nezdaniteľné časti (§11)</td></tr>
     <tr><td>r.30</td><td>NČZD na daňovníka</td><td>${fmt(C.nczd_dankovnik_suma)}</td></tr>
@@ -1086,68 +1099,20 @@ function drawBurdenChart() {
 function calcAsig() {
   const perc = parseFloat(document.getElementById('asig_percento').value) || 0;
   const el = document.getElementById('asig_vysledok');
-  const chk = document.getElementById('asig_check_par50');
-
-  if(perc > 0) {
-    chk.checked = false;
-  } else {
-    chk.checked = true;
-  }
-  updateAsigBoxStyles();
-
+  const boxNeupl = document.getElementById('asig_neuplatnujem_box');
+  const boxUpl   = document.getElementById('asig_uplatnujem_box');
   if(!perc) {
     el.innerHTML = '';
+    if(boxNeupl) boxNeupl.style.display = 'flex';
+    if(boxUpl)   boxUpl.style.display   = 'none';
     buildSummary(); return;
   }
+  if(boxNeupl) boxNeupl.style.display = 'none';
+  if(boxUpl)   boxUpl.style.display   = 'flex';
   const dan = C.dan_po_bonuse || 0;
   const suma = Math.max(3, Math.round(dan * perc) / 100);
   el.innerHTML = `<div class="computed-row"><span class="computed-label">Suma asignácie (r.152) – min. 3 €</span><span class="computed-value highlight">${suma.toFixed(2)} €</span></div>`;
   buildSummary();
-}
-
-function toggleAsigPar50() {
-  const chk = document.getElementById('asig_check_par50');
-  chk.checked = !chk.checked;
-  if(chk.checked) {
-    document.getElementById('asig_percento').value = '0';
-    document.getElementById('asig_vysledok').innerHTML = '';
-  }
-  updateAsigBoxStyles();
-  buildSummary();
-}
-
-function toggleAsigPar50aa() {
-  const chk = document.getElementById('asig_check_par50aa');
-  chk.checked = !chk.checked;
-  updateAsigBoxStyles();
-  buildSummary();
-}
-
-function updateAsigBoxStyles() {
-  const chk50 = document.getElementById('asig_check_par50');
-  const box50 = document.getElementById('asig_par50_box');
-  const lbl50 = document.getElementById('asig_label_par50');
-  if(chk50.checked) {
-    box50.style.background = '#f0faf0'; box50.style.border = '1px solid #b8dfc8';
-    lbl50.style.color = '#2a5c3a';
-    lbl50.innerHTML = 'NEUPLATŇUJEM postup podľa <strong>§ 50 zákona</strong> (r.151 – bez asignácie)';
-  } else {
-    box50.style.background = '#f7f6f9'; box50.style.border = '1px solid #d4c8e8';
-    lbl50.style.color = '#321941';
-    lbl50.innerHTML = 'UPLATŇUJEM postup podľa <strong>§ 50 zákona</strong> – asignácia bude v XML (r.151 + r.152)';
-  }
-  const chk50aa = document.getElementById('asig_check_par50aa');
-  const box50aa = document.getElementById('asig_par50aa_box');
-  const lbl50aa = document.getElementById('asig_label_par50aa');
-  if(chk50aa.checked) {
-    box50aa.style.background = '#f0f0fa'; box50aa.style.border = '1px solid #c8c8e8';
-    lbl50aa.style.color = '#3a3a6a';
-    lbl50aa.innerHTML = 'NEUPLATŇUJEM postup podľa <strong>§ 50aa zákona</strong> (r.153 – poukázanie dane rodičom)';
-  } else {
-    box50aa.style.background = '#faf0f0'; box50aa.style.border = '1px solid #dfc8c8';
-    lbl50aa.style.color = '#6a3a3a';
-    lbl50aa.innerHTML = 'UPLATŇUJEM postup podľa <strong>§ 50aa zákona</strong> (r.153 – poukázanie dane rodičom)';
-  }
 }
 
 
@@ -1199,8 +1164,7 @@ function buildXML() {
   const asigSuhlas = getVal('asig_suhlas') || '0';
   const asigSuma = asigPerc > 0 ? Math.max(3, Math.round((C.dan_po_bonuse||0) * asigPerc) / 100).toFixed(2) : '';
   const splnam3 = asigPerc === 3 ? 1 : 0;
-  const neuplatnujem = document.getElementById('asig_check_par50').checked ? 1 : 0;
-  const neuplatnujemAA = document.getElementById('asig_check_par50aa').checked ? 1 : 0;
+  const neuplatnujem = asigPerc === 0 ? 1 : 0;
   const pausalne_zivnost = rv('vydavky_zivnost')==='pausalne' ? 1 : 0;
   const pausalne_ina     = rv('vydavky_ina')==='pausalne' ? 1 : 0;
   const pausalne = (pausalne_zivnost || pausalne_ina) ? 1 : 0;
@@ -1211,7 +1175,7 @@ function buildXML() {
 
   // §5 preddavky – len ak > 0
   const r36  = C.celk_p5   > 0 ? n2(C.celk_p5)   : '';
-  const r36a = '';
+  const r36a = (C.r36a || 0) > 0 ? n2(C.r36a) : '';
   const r37  = C.celk_poi5 > 0 ? n2(C.celk_poi5) : '';
   const r38  = C.czd_5     > 0 ? n2(C.czd_5)     : '';
   const r39p = C.celk_pred5> 0 ? n2(C.celk_pred5): '';
@@ -1366,10 +1330,7 @@ function buildXML() {
 \t</tabulka1a>
 \t<tabulka1b>
 \t\t<t1r1><s1></s1><s2></s2></t1r1>
-\t\t<t1r2>
-\t\t\t<s1></s1>
-\t\t\t<s2>${pausalne ? n2(vydPauZivnost + vydPauIna) : ''}</s2>
-\t\t</t1r2>
+\t\t<t1r2><s1></s1><s2></s2></t1r2>
 \t</tabulka1b>
 \t<r39>${n2(C.celk_prijmy_6)}</r39>
 \t<r40>${n2(C.celk_vydavky_6)}</r40>
@@ -1465,7 +1426,7 @@ function buildXML() {
 \t</r151>
 \t<r152>${asigSuma}</r152>
 \t<r153>
-\t\t<neuplatnujemPar50aa>${neuplatnujemAA}</neuplatnujemPar50aa>
+\t\t<neuplatnujemPar50aa>1</neuplatnujemPar50aa>
 \t\t<rodicA><rodneCislo></rodneCislo><priezvisko></priezvisko><meno></meno></rodicA>
 \t\t<rodicB><rodneCislo></rodneCislo><priezvisko></priezvisko><meno></meno></rodicB>
 \t\t<bolZverenyDoStarostlivosti>0</bolZverenyDoStarostlivosti>
@@ -1517,10 +1478,10 @@ function buildXML() {
 \t<socZdravPoistenie>
 \t\t<pr1><s1></s1><s2></s2></pr1>
 \t\t<pr2></pr2><pr3></pr3><pr4></pr4><pr5></pr5><pr6></pr6>
-		<pr7></pr7><pr8>${(C.zdravotne > 0 || C.socialne > 0) ? n2(C.zdravotne + C.socialne) : ''}</pr8><pr9></pr9><pr10></pr10>
+\t\t<pr7></pr7><pr8>${(C.celk_poi5||0) > 0 ? n2(C.celk_poi5) : ''}</pr8><pr9>${(C.celk_sp5||0) > 0 ? n2(C.celk_sp5) : ''}</pr9><pr10>${(C.celk_zp5||0) > 0 ? n2(C.celk_zp5) : ''}</pr10>
 \t\t<pr11>${C.socialne > 0 ? n2(C.socialne) : ''}</pr11>
-\t\t<pr12>${(C.celk_sp5||0) > 0 ? n2(C.celk_sp5) : ''}</pr12>
-\t\t<pr13>${(C.zdravotne > 0 || (C.celk_zp5||0) > 0) ? n2((C.zdravotne||0) + (C.celk_zp5||0)) : ''}</pr13>
+\t\t<pr12></pr12>
+\t\t<pr13>${C.zdravotne > 0 ? n2(C.zdravotne) : ''}</pr13>
 		<pr14>${C.zdravotne_pred > 0 ? n2(C.zdravotne_pred) : (C.zdravotne > 0 ? n2(C.zdravotne) : '')}</pr14>
 \t\t<pr15></pr15>
 \t\t<priPrimoch6ods1a2VediemPU>0</priPrimoch6ods1a2VediemPU>
@@ -1692,9 +1653,6 @@ async function generatePDF() {
     document.body.removeChild(container);
   }
 }
-
-// Init checkbox styles
-updateAsigBoxStyles();
 
 </script>
 </body>

@@ -405,7 +405,7 @@
     <div class="section">
       <div class="section-header"><span class="section-tag">VI. ODDIEL / TAB.1</span><span class="section-title">Príjmy z podnikania a inej samostatnej zárobkovej činnosti (§6)</span></div>
       <div class="section-body">
-        <div class="info-box">Paušálne výdavky (§6 ods.10): <strong>60 % z príjmov, max. 20 000 € ročne</strong> + reálne zaplatené odvody. Podmienka: daňovník nebol platiteľom DPH (alebo bol iba časť roka).</div>
+        <div class="info-box">Paušálne výdavky (§6 ods.10): <strong>60 % z príjmov, max. 20 000 € spolu pre ods.1+2</strong> + reálne zaplatené odvody. Pre ods.4 samostatný limit 20 000 €. Podmienka: daňovník nebol platiteľom DPH (alebo bol iba časť roka).</div>
 
         <div class="sub-header section-header" style="background:rgba(79,142,247,.06)">
           <span class="section-tag" style="background:rgba(79,142,247,.15)">§6 ods.1</span>
@@ -521,7 +521,7 @@
         <div class="grid grid-2" style="margin-bottom:16px">
           <div class="field">
             <label>Príspevky III. pilier 2025 (€)</label>
-            <input type="number" id="iii_pilier" value="0" min="0" max="180" step="0.01" oninput="calc()">
+            <input type="number" id="iii_pilier" value="0" min="0" step="0.01" oninput="validateDDS(); calc()">
             <span class="field-note">Max. odpočet: 180 €</span>
           </div>
           <div class="field">
@@ -715,8 +715,8 @@
         </div>
 
         <div style="margin-top:10px;padding:10px 14px;background:#f0f0fa;border:1px solid #c8c8e8;border-radius:8px;display:flex;align-items:center;gap:10px;">
-          <input type="checkbox" checked disabled style="width:16px;height:16px;accent-color:#321941;">
-          <label style="font-size:13px;color:#3a3a6a;margin:0;">neuplatňujem postup podľa <strong>§ 50aa zákona</strong> (r.153 – poukázanie dane rodičom)</label>
+          <input type="checkbox" id="asig_neupl_50aa" checked style="width:16px;height:16px;accent-color:#321941;">
+          <label for="asig_neupl_50aa" style="font-size:13px;color:#3a3a6a;margin:0;cursor:pointer;">neuplatňujem postup podľa <strong>§ 50aa zákona</strong> (r.153 – poukázanie dane rodičom)</label>
         </div>
       </div>
     </div>
@@ -779,6 +779,22 @@ function goPage(n) {
 }
 
 // ——— TOGGLES ———
+function validateDDS() {
+  const el = document.getElementById('iii_pilier');
+  if (parseFloat(el.value) > 180) {
+    el.value = 180;
+    const warn = el.parentElement.querySelector('.dds-warn');
+    if (!warn) {
+      const sp = document.createElement('span');
+      sp.className = 'dds-warn';
+      sp.style.cssText = 'color:#c62828;font-size:11px;display:block;margin-top:2px';
+      sp.textContent = '⚠ Automaticky znížené na maximum 180 €';
+      el.parentElement.appendChild(sp);
+      setTimeout(() => sp.remove(), 3000);
+    }
+  }
+}
+
 function toggleSkutocne() {
   const val = document.querySelector('[name="vydavky_zivnost"]:checked')?.value;
   document.getElementById('skutocne_zivnost').style.display = val==='skutocne' ? 'block' : 'none';
@@ -891,8 +907,21 @@ function calc() {
   const socialne = v('socialne');
   const celkove_odvody = zdravotne + socialne;
 
-  let vydavky_zivnost  = rv('vydavky_zivnost')==='pausalne'  ? Math.min(p_zivnost*0.60, 20000)  : v('v_zivnost_skutocne');
-  let vydavky_dielo    = rv('vydavky_dielo')==='pausalne'    ? Math.min(p_dielo*0.60, 20000)    : v('v_dielo_skutocne');
+  // Paušálne výdavky: 60% z príjmov, max 20 000 € SPOLU pre §6 ods.1+2 (§6 ods.10)
+  const pau_zivnost = rv('vydavky_zivnost')==='pausalne';
+  const pau_dielo   = rv('vydavky_dielo')==='pausalne';
+  let vydavky_zivnost, vydavky_dielo;
+  if (pau_zivnost || pau_dielo) {
+    const raw_z = pau_zivnost ? p_zivnost * 0.60 : 0;
+    const raw_d = pau_dielo   ? p_dielo * 0.60   : 0;
+    const raw_spolu = raw_z + raw_d;
+    const capped = Math.min(raw_spolu, 20000);
+    vydavky_zivnost = pau_zivnost ? (raw_spolu > 0 ? capped * (raw_z / raw_spolu) : 0) : v('v_zivnost_skutocne');
+    vydavky_dielo   = pau_dielo   ? (raw_spolu > 0 ? capped * (raw_d / raw_spolu) : 0) : v('v_dielo_skutocne');
+  } else {
+    vydavky_zivnost = v('v_zivnost_skutocne');
+    vydavky_dielo   = v('v_dielo_skutocne');
+  }
   let vydavky_pouzitie = rv('vydavky_pouzitie')==='pausalne' ? Math.min(p_pouzitie*0.60, 20000) : v('v_pouzitie_skutocne');
 
   const celk_prijmy_12 = p_zivnost + p_dielo;
@@ -1195,8 +1224,10 @@ function buildXML() {
   const pausalne = (pausalne_12 || pausalne_pouzitie) ? 1 : 0;
 
   // Výdavky paušál pre tabulka1b (60% zo živnosti)
-  const vydPauZivnost = pausalne_zivnost ? Math.min(C.p_zivnost*0.60, 20000) : 0;
-  const vydPauDielo    = pausalne_dielo    ? Math.min(C.p_dielo*0.60, 20000)    : 0;
+  const raw12 = (pausalne_zivnost ? C.p_zivnost*0.60 : 0) + (pausalne_dielo ? C.p_dielo*0.60 : 0);
+  const cap12 = Math.min(raw12, 20000);
+  const vydPauZivnost  = pausalne_zivnost && raw12 > 0 ? cap12 * (C.p_zivnost*0.60 / raw12) : 0;
+  const vydPauDielo    = pausalne_dielo && raw12 > 0   ? cap12 * (C.p_dielo*0.60 / raw12)   : 0;
   const vydPauPouzitie = pausalne_pouzitie ? Math.min(C.p_pouzitie*0.60, 20000) : 0;
 
   // §5 preddavky – len ak > 0
@@ -1315,25 +1346,34 @@ function buildXML() {
 \t\t<t1r1><s1></s1><s2></s2></t1r1>
 \t\t<t1r2>
 \t\t\t<s1>${C.p_zivnost > 0 ? n2(C.p_zivnost) : ''}</s1>
-\t\t\t<s2></s2>
+\t\t\t<s2>${C.p_zivnost > 0 ? n2(C.vydavky_zivnost) : ''}</s2>
 \t\t</t1r2>
 \t\t<t1r3>
 \t\t\t<s1></s1>
 \t\t\t<s2></s2>
 \t\t</t1r3>
 \t\t<t1r4><s1></s1><s2></s2></t1r4>
-\t\t<t1r5><s1></s1><s2></s2></t1r5>
+\t\t<t1r5>
+			<s1>${C.p_dielo > 0 ? n2(C.p_dielo) : ''}</s1>
+			<s2>${C.p_dielo > 0 ? n2(C.vydavky_dielo) : ''}</s2>
+		</t1r5>
 \t\t<t1r6><s1></s1><s2></s2></t1r6>
 \t\t<t1r7><s1></s1><s2></s2></t1r7>
 \t\t<t1r8><s1></s1><s2></s2></t1r8>
 \t\t<t1r9><s1></s1><s2></s2></t1r9>
 \t\t<t1r10>
 \t\t\t<s1>${n2(C.celk_prijmy_12)}</s1>
-\t\t\t<s2>${pausalne ? n2(C.celk_vydavky_6) : ''}</s2>
+\t\t\t<s2>${pausalne_12 ? n2(C.vydavky_zivnost + C.vydavky_dielo + C.celkove_odvody) : ''}</s2>
 \t\t</t1r10>
 \t\t<t1r11><s1></s1><s2></s2></t1r11>
-\t\t<t1r12>\n\t\t\t<s1>${C.p_pouzitie > 0 ? n2(C.p_pouzitie) : ''}</s1>\n\t\t\t<s2>${C.p_pouzitie > 0 ? n2(C.vydavky_pouzitie) : ''}</s2>\n\t\t</t1r12>
-\t\t<t1r13><s1></s1><s2></s2></t1r13>
+\t\t<t1r12>
+			<s1>${C.p_pouzitie > 0 ? n2(C.p_pouzitie) : ''}</s1>
+			<s2>${C.p_pouzitie > 0 ? n2(C.vydavky_pouzitie) : ''}</s2>
+		</t1r12>
+\t\t<t1r13>
+\t\t\t<s1>${C.celk_prijmy_4 > 0 ? n2(C.celk_prijmy_4) : ''}</s1>
+\t\t\t<s2>${C.celk_prijmy_4 > 0 ? n2(C.celk_vydavky_4) : ''}</s2>
+\t\t</t1r13>
 \t</tabulka1>
 \t<mikrodanovnikPar2w>0</mikrodanovnikPar2w>
 \t<vydavkyPar6ods11_ods1a2>0</vydavkyPar6ods11_ods1a2>
@@ -1452,7 +1492,7 @@ function buildXML() {
 \t</r151>
 \t<r152>${asigSuma}</r152>
 \t<r153>
-\t\t<neuplatnujemPar50aa>1</neuplatnujemPar50aa>
+\t\t<neuplatnujemPar50aa>${document.getElementById('asig_neupl_50aa').checked ? 1 : 0}</neuplatnujemPar50aa>
 \t\t<rodicA><rodneCislo></rodneCislo><priezvisko></priezvisko><meno></meno></rodicA>
 \t\t<rodicB><rodneCislo></rodneCislo><priezvisko></priezvisko><meno></meno></rodicB>
 \t\t<bolZverenyDoStarostlivosti>0</bolZverenyDoStarostlivosti>

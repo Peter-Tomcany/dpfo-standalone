@@ -502,7 +502,7 @@
     <div class="section">
       <div class="section-header"><span class="section-tag">IX. ODDIEL</span><span class="section-title">Nezdaniteľné časti základu dane (§11)</span></div>
       <div class="section-body">
-        <div class="info-box">NČZD na daňovníka za rok 2025: <strong>5 753,79 €</strong> (ak úhrn ZD ≤ 24 952,06 €). Pri vyššom ZD sa kráti podľa §11 ods.1 písm.a).</div>
+        <div class="info-box">NČZD na daňovníka za rok 2025: <strong>5 753,79 €</strong> (ak úhrn ZD ≤ 25 426,27 €). Pri vyššom ZD sa kráti podľa §11 ods.1 písm.a).</div>
         <div class="grid grid-2" style="margin-bottom:16px">
           <div class="field">
             <label>Uplatniť NČZD na daňovníka? (r.30)</label>
@@ -938,14 +938,14 @@ function calc() {
   const uhrnZD_aktivny = czd_5 + czd_6;
 
   const NCZD_PLNA = 5753.79;
-  const NCZD_LIMIT = 24952.06;
+  const NCZD_LIMIT = 25426.27;
   let nczd_dankovnik_suma = 0;
   if(rv('nczd_dankovnik')==='ano') {
     const doc = v('dochodok');
     if(uhrnZD_aktivny <= NCZD_LIMIT) {
       nczd_dankovnik_suma = Math.max(0, NCZD_PLNA - doc);
     } else {
-      const krat = 9677.73 - uhrnZD_aktivny/4;
+      const krat = 12110.36 - uhrnZD_aktivny/4;
       nczd_dankovnik_suma = Math.max(0, krat - doc);
     }
   }
@@ -1465,7 +1465,7 @@ function buildXML() {
 \t<r108></r108><r109></r109><r110></r110><r111></r111>
 \t<r112></r112><r113></r113><r114></r114><r115></r115>
 \t<r116>${n2(C.dan)}</r116>
-\t<r116a></r116a>
+\t<r116a>${n2(C.czd_5 + Math.max(C.czd_6, C.zd_b))}</r116a>
 \t<r117>${C.bonus > 0 ? n2(C.bonus) : ''}</r117>
 \t<r118>${n2(C.dan_po_bonuse)}</r118>
 \t<r119></r119><r120></r120>

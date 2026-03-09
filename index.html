@@ -140,6 +140,18 @@
 
   .sub-header{margin:0 -22px;padding:10px 22px}
 
+  /* ── ACCORDION ── */
+  .acc-section{border:1.5px solid var(--border);border-radius:10px;margin-bottom:10px;overflow:hidden;background:var(--surface)}
+  .acc-header{display:flex;align-items:center;gap:10px;padding:12px 18px;cursor:pointer;user-select:none;transition:background .15s}
+  .acc-header:hover{background:rgba(50,25,65,.03)}
+  .acc-dot{width:8px;height:8px;border-radius:50%;background:var(--border);flex-shrink:0;transition:background .3s}
+  .acc-dot.filled{background:#4caf50}
+  .acc-summary{font-size:12px;color:var(--muted);margin-left:auto;white-space:nowrap;font-weight:600}
+  .acc-chevron{color:var(--muted);transition:transform .25s;font-size:11px}
+  .acc-section.open .acc-chevron{transform:rotate(180deg);color:var(--purple)}
+  .acc-body{max-height:0;overflow:hidden;transition:max-height .35s cubic-bezier(.4,0,.2,1),padding .2s;padding:0 18px}
+  .acc-section.open .acc-body{max-height:900px;padding:12px 18px 18px}
+
   /* ── CHILD CARD ── */
   .child-card{background:var(--surface2);border:1.5px solid var(--border);border-radius:10px;padding:16px}
   .child-card-header{display:flex;align-items:center;gap:10px;margin-bottom:14px}
@@ -407,85 +419,165 @@
       <div class="section-body">
         <div class="info-box">Paušálne výdavky (§6 ods.10): <strong>60 % z príjmov, max. 20 000 € spolu pre ods.1+2</strong> + reálne zaplatené odvody. Pre ods.4 samostatný limit 20 000 €. Podmienka: daňovník nebol platiteľom DPH (alebo bol iba časť roka).</div>
 
-        <div class="sub-header section-header" style="background:rgba(79,142,247,.06)">
-          <span class="section-tag" style="background:rgba(79,142,247,.15)">§6 ods.1</span>
-          <span class="section-title" style="font-size:12px">Živnosť (ods.1 písm. b) – r.02 Tab.1</span>
-        </div>
-        <div class="grid grid-2" style="margin-top:16px;margin-bottom:16px">
-          <div class="field"><label>Príjmy zo živnosti (€)</label><input type="number" id="p_zivnost" value="0" min="0" step="0.01" oninput="calc()"></div>
-          <div class="field">
-            <label>Spôsob výdavkov</label>
-            <div class="radio-group">
-              <label class="radio-opt"><input type="radio" name="vydavky_zivnost" value="pausalne" checked onchange="toggleSkutocne()"> Paušálne 60%</label>
-              <label class="radio-opt"><input type="radio" name="vydavky_zivnost" value="skutocne" onchange="toggleSkutocne()"> Skutočné</label>
+        <!-- ACCORDION: §6 ods.1 -->
+        <div class="acc-section open" id="acc_ods1">
+          <div class="acc-header" onclick="toggleAcc('acc_ods1')">
+            <span class="acc-dot" id="dot_ods1"></span>
+            <span class="section-tag" style="background:rgba(79,142,247,.15);color:#1565c0;font-size:10px">§6 ods.1</span>
+            <span style="font-size:13px;font-weight:600;color:#333">Živnosť (ods.1 písm. b) – r.02 Tab.1</span>
+            <span class="acc-summary" id="sum_ods1">—</span>
+            <span class="acc-chevron">▼</span>
+          </div>
+          <div class="acc-body">
+            <div class="grid grid-2">
+              <div class="field"><label>Príjmy zo živnosti (€)</label><input type="number" id="p_zivnost" value="0" min="0" step="0.01" oninput="calc()"></div>
+              <div class="field">
+                <label>Spôsob výdavkov</label>
+                <div class="radio-group">
+                  <label class="radio-opt"><input type="radio" name="vydavky_zivnost" value="pausalne" checked onchange="toggleSkutocne()"> Paušálne 60%</label>
+                  <label class="radio-opt"><input type="radio" name="vydavky_zivnost" value="skutocne" onchange="toggleSkutocne()"> Skutočné</label>
+                </div>
+              </div>
+            </div>
+            <div id="skutocne_zivnost" style="display:none;margin-top:12px">
+              <div class="field"><label>Skutočné výdavky zo živnosti (bez odvodov) (€)</label><input type="number" id="v_zivnost_skutocne" value="0" min="0" step="0.01" oninput="calc()"></div>
             </div>
           </div>
         </div>
-        <div id="skutocne_zivnost" style="display:none;margin-bottom:16px">
-          <div class="field"><label>Skutočné výdavky zo živnosti (bez odvodov) (€)</label><input type="number" id="v_zivnost_skutocne" value="0" min="0" step="0.01" oninput="calc()"></div>
-        </div>
 
-        <hr class="divider">
-
-        <div class="sub-header section-header" style="background:rgba(124,92,191,.06)">
-          <span class="section-tag" style="background:rgba(124,92,191,.15)">§6 ods.2</span>
-          <span class="section-title" style="font-size:12px">Z vytvorenia diela a umeleckého výkonu (ods.2 písm. a) – r.05 Tab.1</span>
-        </div>
-        <div class="grid grid-2" style="margin-top:16px;margin-bottom:16px">
-          <div class="field"><label>Príjmy z vytvorenia diela (€)</label><input type="number" id="p_dielo" value="0" min="0" step="0.01" oninput="calc()"></div>
-          <div class="field">
-            <label>Spôsob výdavkov</label>
-            <div class="radio-group">
-              <label class="radio-opt"><input type="radio" name="vydavky_dielo" value="pausalne" checked onchange="toggleSkutocneDielo()"> Paušálne 60%</label>
-              <label class="radio-opt"><input type="radio" name="vydavky_dielo" value="skutocne" onchange="toggleSkutocneDielo()"> Skutočné</label>
+        <!-- ACCORDION: §6 ods.1 písm.c) -->
+        <div class="acc-section" id="acc_ods1c">
+          <div class="acc-header" onclick="toggleAcc('acc_ods1c')">
+            <span class="acc-dot" id="dot_ods1c"></span>
+            <span class="section-tag" style="background:rgba(0,150,136,.15);color:#00695c;font-size:10px">§6 ods.1c</span>
+            <span style="font-size:13px;font-weight:600;color:#333">Podnikanie podľa osobitných predpisov (písm. c) – r.03 Tab.1</span>
+            <span class="acc-summary" id="sum_ods1c">—</span>
+            <span class="acc-chevron">▼</span>
+          </div>
+          <div class="acc-body">
+            <div style="margin-bottom:10px;padding:8px 12px;background:rgba(0,150,136,.06);border-radius:8px;font-size:11.5px;color:#555;line-height:1.5">
+              Príjmy z podnikania vykonávaného podľa osobitných predpisov — daňové poradenstvo, audítorstvo, notárska činnosť, advokácia, znalecká činnosť a pod.
+            </div>
+            <div class="grid grid-2">
+              <div class="field"><label>Príjmy z podnikania podľa os. predpisov (€)</label><input type="number" id="p_poradca" value="0" min="0" step="0.01" oninput="calc()"></div>
+              <div class="field">
+                <label>Spôsob výdavkov</label>
+                <div class="radio-group">
+                  <label class="radio-opt"><input type="radio" name="vydavky_poradca" value="pausalne" checked onchange="toggleSkutocnePoradca()"> Paušálne 60%</label>
+                  <label class="radio-opt"><input type="radio" name="vydavky_poradca" value="skutocne" onchange="toggleSkutocnePoradca()"> Skutočné</label>
+                </div>
+              </div>
+            </div>
+            <div id="skutocne_poradca" style="display:none;margin-top:12px">
+              <div class="field"><label>Skutočné výdavky (bez odvodov) (€)</label><input type="number" id="v_poradca_skutocne" value="0" min="0" step="0.01" oninput="calc()"></div>
             </div>
           </div>
         </div>
-        <div id="skutocne_dielo" style="display:none;margin-bottom:16px">
-          <div class="field"><label>Skutočné výdavky z vytvorenia diela (bez odvodov) (€)</label><input type="number" id="v_dielo_skutocne" value="0" min="0" step="0.01" oninput="calc()"></div>
-        </div>
 
-        <hr class="divider">
-
-        <div class="sub-header section-header" style="background:rgba(255,152,0,.06)">
-          <span class="section-tag" style="background:rgba(255,152,0,.15)">§6 ods.4</span>
-          <span class="section-title" style="font-size:12px">Z použitia diela a umeleckého výkonu – r.12 Tab.1</span>
-        </div>
-        <div class="grid grid-2" style="margin-top:16px;margin-bottom:16px">
-          <div class="field"><label>Príjmy z použitia diela (€)</label><input type="number" id="p_pouzitie" value="0" min="0" step="0.01" oninput="calc()"></div>
-          <div class="field">
-            <label>Spôsob výdavkov</label>
-            <div class="radio-group">
-              <label class="radio-opt"><input type="radio" name="vydavky_pouzitie" value="pausalne" checked onchange="toggleSkutocnePouzitie()"> Paušálne 60%</label>
-              <label class="radio-opt"><input type="radio" name="vydavky_pouzitie" value="skutocne" onchange="toggleSkutocnePouzitie()"> Skutočné</label>
+        <!-- ACCORDION: §6 ods.2 -->
+        <div class="acc-section" id="acc_ods2">
+          <div class="acc-header" onclick="toggleAcc('acc_ods2')">
+            <span class="acc-dot" id="dot_ods2"></span>
+            <span class="section-tag" style="background:rgba(124,92,191,.15);color:#6a3d9a;font-size:10px">§6 ods.2</span>
+            <span style="font-size:13px;font-weight:600;color:#333">Z vytvorenia diela a umeleckého výkonu – r.05 Tab.1</span>
+            <span class="acc-summary" id="sum_ods2">—</span>
+            <span class="acc-chevron">▼</span>
+          </div>
+          <div class="acc-body">
+            <div class="grid grid-2">
+              <div class="field"><label>Príjmy z vytvorenia diela (€)</label><input type="number" id="p_dielo" value="0" min="0" step="0.01" oninput="calc()"></div>
+              <div class="field">
+                <label>Spôsob výdavkov</label>
+                <div class="radio-group">
+                  <label class="radio-opt"><input type="radio" name="vydavky_dielo" value="pausalne" checked onchange="toggleSkutocneDielo()"> Paušálne 60%</label>
+                  <label class="radio-opt"><input type="radio" name="vydavky_dielo" value="skutocne" onchange="toggleSkutocneDielo()"> Skutočné</label>
+                </div>
+              </div>
+            </div>
+            <div id="skutocne_dielo" style="display:none;margin-top:12px">
+              <div class="field"><label>Skutočné výdavky z vytvorenia diela (bez odvodov) (€)</label><input type="number" id="v_dielo_skutocne" value="0" min="0" step="0.01" oninput="calc()"></div>
             </div>
           </div>
         </div>
-        <div id="skutocne_pouzitie" style="display:none;margin-bottom:16px">
-          <div class="field"><label>Skutočné výdavky z použitia diela (bez odvodov) (€)</label><input type="number" id="v_pouzitie_skutocne" value="0" min="0" step="0.01" oninput="calc()"></div>
+
+        <!-- ACCORDION: §6 ods.4 -->
+        <div class="acc-section" id="acc_ods4">
+          <div class="acc-header" onclick="toggleAcc('acc_ods4')">
+            <span class="acc-dot" id="dot_ods4"></span>
+            <span class="section-tag" style="background:rgba(255,152,0,.15);color:#e65100;font-size:10px">§6 ods.4</span>
+            <span style="font-size:13px;font-weight:600;color:#333">Z použitia diela a umeleckého výkonu – r.12 Tab.1</span>
+            <span class="acc-summary" id="sum_ods4">—</span>
+            <span class="acc-chevron">▼</span>
+          </div>
+          <div class="acc-body">
+            <div class="grid grid-2">
+              <div class="field"><label>Príjmy z použitia diela (€)</label><input type="number" id="p_pouzitie" value="0" min="0" step="0.01" oninput="calc()"></div>
+              <div class="field">
+                <label>Spôsob výdavkov</label>
+                <div class="radio-group">
+                  <label class="radio-opt"><input type="radio" name="vydavky_pouzitie" value="pausalne" checked onchange="toggleSkutocnePouzitie()"> Paušálne 60%</label>
+                  <label class="radio-opt"><input type="radio" name="vydavky_pouzitie" value="skutocne" onchange="toggleSkutocnePouzitie()"> Skutočné</label>
+                </div>
+              </div>
+            </div>
+            <div id="skutocne_pouzitie" style="display:none;margin-top:12px">
+              <div class="field"><label>Skutočné výdavky z použitia diela (bez odvodov) (€)</label><input type="number" id="v_pouzitie_skutocne" value="0" min="0" step="0.01" oninput="calc()"></div>
+            </div>
+          </div>
         </div>
 
-        <hr class="divider">
+        <!-- ACCORDION: §6 ods.3 Prenájom -->
+        <div class="acc-section" id="acc_ods3">
+          <div class="acc-header" onclick="toggleAcc('acc_ods3')">
+            <span class="acc-dot" id="dot_ods3"></span>
+            <span class="section-tag" style="background:rgba(33,150,243,.15);color:#1565c0;font-size:10px">§6 ods.3</span>
+            <span style="font-size:13px;font-weight:600;color:#333">Príjem z prenájmu nehnuteľností – r.11 Tab.1</span>
+            <span class="acc-summary" id="sum_ods3">—</span>
+            <span class="acc-chevron">▼</span>
+          </div>
+          <div class="acc-body">
+            <div style="margin-bottom:10px;padding:8px 12px;background:rgba(33,150,243,.06);border-radius:8px;font-size:11.5px;color:#555;line-height:1.5">
+              Uvádzajte <strong>kladný rozdiel</strong> medzi príjmom z prenájmu a oslobodenou sumou <strong>500 €</strong> (§9 ods.1 písm. g). Výdavky uvádzajte v pomere zahrnutých príjmov k celkovým príjmom. Paušálne výdavky sa pri prenájme <strong>neuplatňujú</strong> — iba preukázateľné.
+            </div>
+            <div class="grid grid-2">
+              <div class="field">
+                <label>Príjmy z prenájmu po oslobodení 500 € (€)</label>
+                <input type="number" id="p_prenajom" value="0" min="0" step="0.01" oninput="calc()">
+                <span class="field-note">Príjem − 500 € (§9 ods.1 písm. g). Ak je rozdiel záporný, uveďte 0.</span>
+              </div>
+              <div class="field">
+                <label>Preukázateľné výdavky z prenájmu (€)</label>
+                <input type="number" id="v_prenajom" value="0" min="0" step="0.01" oninput="calc()">
+                <span class="field-note">Skutočné výdavky v pomere zahrnutých príjmov k celkovým.</span>
+              </div>
+            </div>
+          </div>
+        </div>
 
+        <!-- ODVODY – permanently visible (no accordion) -->
+        <div style="margin-top:6px"></div>
         <div class="sub-header section-header" style="background:rgba(62,207,142,.06)">
-          <span class="section-tag" style="background:rgba(62,207,142,.15)">ODVODY</span>
-          <span class="section-title" style="font-size:12px">Zaplatené poistné – pod Tab.1 / Príloha č.4</span>
+          <span class="section-tag" style="background:rgba(62,207,142,.15)">ODVODY SČZO</span>
+          <span class="section-title" style="font-size:12px">Zaplatené poistné pod Tab.1 / Príloha č.4</span>
+        </div>
+        <div style="margin-top:8px;margin-bottom:8px;padding:8px 12px;background:rgba(62,207,142,.06);border-radius:8px;font-size:11.5px;color:#555;line-height:1.5">
+          Nasledujúce polia sa týkajú odvodov, ktoré ste ako <strong>SZČO</strong> zaplatili v roku 2025 v súvislosti s príjmami podľa § 6 (živnosť, umelecká činnosť, prenájom). Ide o údaje pre <strong>Prílohu č. 4</strong> priznania. Odvody ako zamestnanec (zrazené zamestnávateľom) sa sem <strong>neuvádzajú</strong> — tie sú už zahrnuté v sekcii § 5.
         </div>
         <div class="grid grid-3" style="margin-top:16px;margin-bottom:16px">
           <div class="field">
-            <label>ZP zaplatené celkom 2025 (€) – r.13</label>
+            <label>ZP zaplatené celkom 2025 (€) – Príl.4 r.13</label>
             <input type="number" id="zdravotne" value="0" min="0" step="0.01" oninput="calc()">
-            <span class="field-note">Celkové preukázateľne zaplatené ZP (vrátane ročného vyrovnania)</span>
+            <span class="field-note">Celkové preukázateľne zaplatené zdravotné poistenie (vrátane ročného vyrovnania)</span>
           </div>
           <div class="field">
-            <label>ZP preddavky zaplatené 2025 (€) – r.14</label>
+            <label>ZP preddavky zaplatené 2025 (€) – Príl.4 r.14</label>
             <input type="number" id="zdravotne_pred" value="0" min="0" step="0.01" oninput="calc()">
-            <span class="field-note">Iba preddavky na ZP zaplatené v roku 2025 (r.14 ≤ r.13)</span>
+            <span class="field-note">Iba preddavky na zdravotné poistenie zaplatené v roku 2025 (r.14 ≤ r.13)</span>
           </div>
           <div class="field">
-            <label>Sociálne poistenie zaplatené 2025 (€) – r.11</label>
+            <label>SOCP zaplatené 2025 (€) – Príl.4 r.11</label>
             <input type="number" id="socialne" value="0" min="0" step="0.01" oninput="calc()">
-            <span class="field-note">Poistné SP zaplatené v roku 2025</span>
+            <span class="field-note">Sociálne poistenie zaplatené v roku 2025</span>
           </div>
         </div>
         <div id="vysledok_prijmy" style="margin-top:8px"></div>
@@ -795,6 +887,10 @@ function validateDDS() {
   }
 }
 
+function toggleAcc(id) {
+  document.getElementById(id).classList.toggle('open');
+}
+
 function toggleSkutocne() {
   const val = document.querySelector('[name="vydavky_zivnost"]:checked')?.value;
   document.getElementById('skutocne_zivnost').style.display = val==='skutocne' ? 'block' : 'none';
@@ -803,6 +899,11 @@ function toggleSkutocne() {
 function toggleSkutocneDielo() {
   const val = document.querySelector('[name="vydavky_dielo"]:checked')?.value;
   document.getElementById('skutocne_dielo').style.display = val==='skutocne' ? 'block' : 'none';
+  calc();
+}
+function toggleSkutocnePoradca() {
+  const val = document.querySelector('[name="vydavky_poradca"]:checked')?.value;
+  document.getElementById('skutocne_poradca').style.display = val==='skutocne' ? 'block' : 'none';
   calc();
 }
 function toggleSkutocnePouzitie() {
@@ -900,40 +1001,60 @@ function calc() {
 
   // §6
   const p_zivnost = v('p_zivnost');
+  const p_poradca = v('p_poradca');
   const p_dielo = v('p_dielo');
   const p_pouzitie = v('p_pouzitie');
+  const p_prenajom = v('p_prenajom');
+  const v_prenajom = Math.min(v('v_prenajom'), p_prenajom); // výdavky max do výšky príjmov
   const zdravotne = v('zdravotne');
   const zdravotne_pred = Math.min(v('zdravotne_pred'), v('zdravotne'));
   const socialne = v('socialne');
   const celkove_odvody = zdravotne + socialne;
 
   // Paušálne výdavky: 60% z príjmov, max 20 000 € SPOLU pre §6 ods.1+2 (§6 ods.10)
+  // Spoločný limit zahŕňa živnosť (písm.b), osobitné predpisy (písm.c) aj dielo (ods.2)
   const pau_zivnost = rv('vydavky_zivnost')==='pausalne';
+  const pau_poradca = rv('vydavky_poradca')==='pausalne';
   const pau_dielo   = rv('vydavky_dielo')==='pausalne';
-  let vydavky_zivnost, vydavky_dielo;
-  if (pau_zivnost || pau_dielo) {
+  let vydavky_zivnost, vydavky_poradca, vydavky_dielo;
+  if (pau_zivnost || pau_poradca || pau_dielo) {
     const raw_z = pau_zivnost ? p_zivnost * 0.60 : 0;
+    const raw_p = pau_poradca ? p_poradca * 0.60 : 0;
     const raw_d = pau_dielo   ? p_dielo * 0.60   : 0;
-    const raw_spolu = raw_z + raw_d;
+    const raw_spolu = raw_z + raw_p + raw_d;
     const capped = Math.min(raw_spolu, 20000);
     vydavky_zivnost = pau_zivnost ? (raw_spolu > 0 ? capped * (raw_z / raw_spolu) : 0) : v('v_zivnost_skutocne');
+    vydavky_poradca = pau_poradca ? (raw_spolu > 0 ? capped * (raw_p / raw_spolu) : 0) : v('v_poradca_skutocne');
     vydavky_dielo   = pau_dielo   ? (raw_spolu > 0 ? capped * (raw_d / raw_spolu) : 0) : v('v_dielo_skutocne');
   } else {
     vydavky_zivnost = v('v_zivnost_skutocne');
+    vydavky_poradca = v('v_poradca_skutocne');
     vydavky_dielo   = v('v_dielo_skutocne');
   }
   let vydavky_pouzitie = rv('vydavky_pouzitie')==='pausalne' ? Math.min(p_pouzitie*0.60, 20000) : v('v_pouzitie_skutocne');
 
-  const celk_prijmy_12 = p_zivnost + p_dielo;
-  const celk_vydavky_12 = vydavky_zivnost + vydavky_dielo + celkove_odvody;
+  // §6 ods.1 + ods.2 → §4b (r.02 + r.03 + r.05 = r.10)
+  const celk_prijmy_12 = p_zivnost + p_poradca + p_dielo;
+  const celk_vydavky_12 = vydavky_zivnost + vydavky_poradca + vydavky_dielo + celkove_odvody;
   let czd_6 = Math.max(0, celk_prijmy_12 - celk_vydavky_12);
 
+  // §6 ods.3 – prenájom (iba preukázateľné výdavky)
+  const celk_prijmy_3 = p_prenajom;
+  const celk_vydavky_3 = v_prenajom;
+  let czd_6_3 = Math.max(0, celk_prijmy_3 - celk_vydavky_3);
+
+  // §6 ods.4
   const celk_prijmy_4 = p_pouzitie;
   const celk_vydavky_4 = vydavky_pouzitie;
   let czd_6_4 = Math.max(0, celk_prijmy_4 - celk_vydavky_4);
 
-  const celk_prijmy_6 = celk_prijmy_12 + celk_prijmy_4;
-  const celk_vydavky_6 = celk_vydavky_12 + celk_vydavky_4;
+  // §6 ods.3+4 spolu (r.13 Tab.1 → r.58/r.59/r.60)
+  const celk_prijmy_34 = celk_prijmy_3 + celk_prijmy_4;
+  const celk_vydavky_34 = Math.min(celk_prijmy_34, celk_vydavky_3 + celk_vydavky_4);
+  let czd_6_34 = Math.max(0, celk_prijmy_34 - celk_vydavky_34);
+
+  const celk_prijmy_6 = celk_prijmy_12 + celk_prijmy_34;
+  const celk_vydavky_6 = celk_vydavky_12 + celk_vydavky_34;
 
   const uhrnZD_aktivny = czd_5 + czd_6;
 
@@ -959,7 +1080,7 @@ function calc() {
   let zd_6_po_nczd = Math.max(0, czd_6 - nczd_zostatok_pre_6);
 
   const PASOM_A = 48441.43;
-  const zd_a = zd_5_po_nczd + czd_6_4;
+  const zd_a = zd_5_po_nczd + czd_6_34;
   let dan_a = zd_a <= PASOM_A ? zd_a * 0.19 : PASOM_A * 0.19 + (zd_a - PASOM_A) * 0.25;
 
   const zd_b = zd_6_po_nczd;
@@ -985,35 +1106,47 @@ function calc() {
   const preplatok = Math.max(0, celk_pred5 - dan_po_bonuse);
 
   Object.assign(C, {
-    p_zivnost, p_dielo, p_pouzitie, celk_prijmy_12, celk_prijmy_4, celk_prijmy_6,
-    vydavky_zivnost, vydavky_dielo, vydavky_pouzitie, celkove_odvody,
-    celk_vydavky_12, celk_vydavky_4, celk_vydavky_6,
-    czd_6, czd_6_4, czd_5, uhrnZD_aktivny,
+    p_zivnost, p_poradca, p_dielo, p_pouzitie, p_prenajom, v_prenajom,
+    celk_prijmy_12, celk_prijmy_3, celk_prijmy_4, celk_prijmy_34, celk_prijmy_6,
+    vydavky_zivnost, vydavky_poradca, vydavky_dielo, vydavky_pouzitie, celkove_odvody,
+    celk_vydavky_12, celk_vydavky_3, celk_vydavky_4, celk_vydavky_34, celk_vydavky_6,
+    czd_6, czd_6_3, czd_6_4, czd_6_34, czd_5, uhrnZD_aktivny,
     nczd_dankovnik_suma, iii, nczd_manzel, celk_nczd,
     zd_po_nczd, dan, bonus_raw, bonus_limit, bonus,
     dan_po_bonuse, dan_na_uhradu, preplatok,
     zdravotne, zdravotne_pred, socialne
   });
 
+  // Update accordion summaries & dots
+  const _d = (id, filled) => { const e = document.getElementById(id); if(e) e.classList.toggle('filled', filled); };
+  const _s = (id, txt) => { const e = document.getElementById(id); if(e) e.textContent = txt; };
+  _d('dot_ods1', p_zivnost > 0); _s('sum_ods1', p_zivnost > 0 ? `Príjem: ${fmt(p_zivnost)}` : '—');
+  _d('dot_ods1c', p_poradca > 0);_s('sum_ods1c', p_poradca > 0 ? `Príjem: ${fmt(p_poradca)}` : '—');
+  _d('dot_ods2', p_dielo > 0);   _s('sum_ods2', p_dielo > 0 ? `Príjem: ${fmt(p_dielo)}` : '—');
+  _d('dot_ods4', p_pouzitie > 0);_s('sum_ods4', p_pouzitie > 0 ? `Príjem: ${fmt(p_pouzitie)}` : '—');
+  _d('dot_ods3', p_prenajom > 0);_s('sum_ods3', p_prenajom > 0 ? `Príjem: ${fmt(p_prenajom)}` : '—');
+
   const r1 = document.getElementById('vysledok_prijmy');
   if(r1) r1.innerHTML = `
     <div class="computed-row"><span class="computed-label">Príjmy §6 ods.1+2 (r.10)</span><span class="computed-value">${fmt(celk_prijmy_12)}</span></div>
-    ${p_pouzitie > 0 ? `<div class="computed-row"><span class="computed-label">Príjmy §6 ods.4 (r.13)</span><span class="computed-value">${fmt(celk_prijmy_4)}</span></div>` : ''}
+    ${p_prenajom > 0 ? `<div class="computed-row"><span class="computed-label">Príjmy §6 ods.3 – prenájom (r.11)</span><span class="computed-value">${fmt(p_prenajom)}</span></div>` : ''}
+    ${p_pouzitie > 0 ? `<div class="computed-row"><span class="computed-label">Príjmy §6 ods.4 – použitie diela (r.12)</span><span class="computed-value">${fmt(celk_prijmy_4)}</span></div>` : ''}
+    ${celk_prijmy_34 > 0 ? `<div class="computed-row"><span class="computed-label">Príjmy §6 ods.3+4 spolu (r.13)</span><span class="computed-value">${fmt(celk_prijmy_34)}</span></div>` : ''}
     <div class="computed-row"><span class="computed-label">Výdavky §6 (paušál + odvody)</span><span class="computed-value">${fmt(celk_vydavky_6)}</span></div>
     <div class="computed-row"><span class="computed-label">ČZD §6 ods.1+2 (r.55)</span><span class="computed-value highlight">${fmt(czd_6)}</span></div>
-    ${czd_6_4 > 0 ? `<div class="computed-row"><span class="computed-label">ČZD §6 ods.4 (r.65)</span><span class="computed-value highlight">${fmt(czd_6_4)}</span></div>` : ''}
-    <div class="computed-row"><span class="computed-label">Príl.č.4 r.11 – SP zaplatené (§6)</span><span class="computed-value">${fmt(socialne)}</span></div>
-    <div class="computed-row"><span class="computed-label">Príl.č.4 r.13 – ZP zaplatené (§6)</span><span class="computed-value">${fmt(zdravotne)}</span></div>
-    <div class="computed-row"><span class="computed-label">Príl.č.4 r.14 – preddavky ZP (§6)</span><span class="computed-value">${fmt(zdravotne_pred)}</span></div>
+    ${czd_6_34 > 0 ? `<div class="computed-row"><span class="computed-label">ČZD §6 ods.3+4 (r.60)</span><span class="computed-value highlight">${fmt(czd_6_34)}</span></div>` : ''}
+    <div class="computed-row"><span class="computed-label">Príl.4 r.11 – SOCP zaplatené</span><span class="computed-value">${fmt(socialne)}</span></div>
+    <div class="computed-row"><span class="computed-label">Príl.4 r.13 – ZP zaplatené</span><span class="computed-value">${fmt(zdravotne)}</span></div>
+    <div class="computed-row"><span class="computed-label">Príl.4 r.14 – ZP preddavky</span><span class="computed-value">${fmt(zdravotne_pred)}</span></div>
   `;
 
   const r2 = document.getElementById('vysledok_odpcty');
   if(r2) r2.innerHTML = `
     <div class="computed-row"><span class="computed-label">ČZD §5</span><span class="computed-value">${fmt(czd_5)}</span></div>
     <div class="computed-row"><span class="computed-label">ČZD §6 ods.1+2</span><span class="computed-value">${fmt(czd_6)}</span></div>
-    ${czd_6_4 > 0 ? `<div class="computed-row"><span class="computed-label">ČZD §6 ods.4</span><span class="computed-value">${fmt(czd_6_4)}</span></div>` : ''}
+    ${czd_6_34 > 0 ? `<div class="computed-row"><span class="computed-label">ČZD §6 ods.3+4 (r.60)</span><span class="computed-value">${fmt(czd_6_34)}</span></div>` : ''}
     <div class="computed-row"><span class="computed-label">NČZD celkom</span><span class="computed-value">${fmt(celk_nczd)}</span></div>
-    <div class="computed-row"><span class="computed-label">ZD §4a (§5 + §6/4) po NČZD → 19%/25%</span><span class="computed-value">${fmt(zd_a)}</span></div>
+    <div class="computed-row"><span class="computed-label">ZD §4a (§5 + §6 ods.3+4) po NČZD → 19%/25%</span><span class="computed-value">${fmt(zd_a)}</span></div>
     <div class="computed-row"><span class="computed-label">ZD §4b (§6 ods.1+2) po NČZD → ${sadzba_b}</span><span class="computed-value">${fmt(zd_b)}</span></div>
     <div class="computed-row"><span class="computed-label">Daň §4a (r.81)</span><span class="computed-value">${fmt(dan_a)}</span></div>
     <div class="computed-row"><span class="computed-label">Daň §4b (r.96)</span><span class="computed-value">${fmt(dan_b)}</span></div>
@@ -1037,25 +1170,32 @@ function buildSummary() {
     <tr><td>r.38</td><td>ČZD §5</td><td>${fmt(C.czd_5)}</td></tr>
     <tr><td>r.39</td><td>Zrazené preddavky na daň</td><td>${fmt(C.celk_pred5)}</td></tr>
     <tr class="section-sep"><td colspan="3">Príjmy z podnikania §6</td></tr>
-    <tr><td>r.02</td><td>Príjmy zo živnosti (§6 ods.1)</td><td>${fmt(C.p_zivnost)}</td></tr>
+    <tr><td>r.02</td><td>Príjmy zo živnosti (§6 ods.1 písm. b)</td><td>${fmt(C.p_zivnost)}</td></tr>
+    ${C.p_poradca > 0 ? `<tr><td>r.03</td><td>Podnikanie podľa os. predpisov (§6 ods.1 písm. c)</td><td>${fmt(C.p_poradca)}</td></tr>` : ''}
     <tr><td>r.05</td><td>Z vytvorenia diela (§6 ods.2)</td><td>${fmt(C.p_dielo)}</td></tr>
     <tr><td>r.10</td><td>Príjmy §6 ods.1+2 spolu</td><td>${fmt(C.celk_prijmy_12)}</td></tr>
     <tr><td></td><td>Výdavky ods.1+2 (paušál + odvody)</td><td>${fmt(C.celk_vydavky_12)}</td></tr>
+    ${C.p_prenajom > 0 ? `
+    <tr><td>r.11</td><td>Prenájom nehnuteľností (§6 ods.3)</td><td>${fmt(C.p_prenajom)}</td></tr>
+    <tr><td></td><td>Výdavky ods.3 (preukázateľné)</td><td>${fmt(C.v_prenajom)}</td></tr>
+    ` : ''}
     ${C.p_pouzitie > 0 ? `
     <tr><td>r.12</td><td>Z použitia diela (§6 ods.4)</td><td>${fmt(C.p_pouzitie)}</td></tr>
     <tr><td></td><td>Výdavky ods.4 (paušál)</td><td>${fmt(C.vydavky_pouzitie)}</td></tr>
-    <tr><td>r.65</td><td>ČZD §6 ods.4</td><td>${fmt(C.czd_6_4)}</td></tr>
     ` : ''}
-    <tr><td>Príl.4 r.11</td><td>Sociálne poistenie §6</td><td>${fmt(C.socialne)}</td></tr>
-    <tr><td>Príl.4 r.13</td><td>Zdravotné poistenie §6 (celkom)</td><td>${fmt(C.zdravotne)}</td></tr>
-    <tr><td>Príl.4 r.14</td><td>ZP §6 – preddavky</td><td>${fmt(C.zdravotne_pred || 0)}</td></tr>
+    ${C.czd_6_34 > 0 ? `
+    <tr><td>r.60</td><td>ČZD §6 ods.3+4</td><td>${fmt(C.czd_6_34)}</td></tr>
+    ` : ''}
+    <tr><td>Príl.4 r.11</td><td>SOCP zaplatené (SZČO)</td><td>${fmt(C.socialne)}</td></tr>
+    <tr><td>Príl.4 r.13</td><td>ZP zaplatené (SZČO)</td><td>${fmt(C.zdravotne)}</td></tr>
+    <tr><td>Príl.4 r.14</td><td>ZP preddavky</td><td>${fmt(C.zdravotne_pred || 0)}</td></tr>
     <tr><td>r.55</td><td>ČZD §6 ods.1+2</td><td>${fmt(C.czd_6)}</td></tr>
     <tr class="section-sep"><td colspan="3">Nezdaniteľné časti (§11)</td></tr>
     <tr><td>r.30</td><td>NČZD na daňovníka</td><td>${fmt(C.nczd_dankovnik_suma)}</td></tr>
     <tr><td>r.31</td><td>NČZD na manžel/ku</td><td>${fmt(C.nczd_manzel)}</td></tr>
     <tr><td></td><td>III. pilier (max 180 €)</td><td>${fmt(C.iii)}</td></tr>
     <tr class="section-sep"><td colspan="3">Výpočet dane</td></tr>
-    <tr><td>r.78</td><td>ZD §4a (§5 po NČZD) → 19%/25%</td><td>${fmt(C.zd_a)}</td></tr>
+    <tr><td>r.78</td><td>ZD §4a (§5 + §6 ods.3+4 po NČZD) → 19%/25%</td><td>${fmt(C.zd_a)}</td></tr>
     <tr><td>r.81</td><td>Daň zo ZD §4a</td><td>${fmt(C.dan_a)}</td></tr>
     <tr><td>r.92</td><td>ZD §4b (§6 ods.1+2 po NČZD) → ${C.sadzba_b}</td><td>${fmt(C.zd_b)}</td></tr>
     <tr><td>r.96</td><td>Daň zo ZD §4b</td><td>${fmt(C.dan_b)}</td></tr>
@@ -1218,15 +1358,17 @@ function buildXML() {
   const splnam3 = asigPerc === 3 ? 1 : 0;
   const neuplatnujem = asigPerc === 0 ? 1 : 0;
   const pausalne_zivnost  = rv('vydavky_zivnost')==='pausalne' ? 1 : 0;
+  const pausalne_poradca  = rv('vydavky_poradca')==='pausalne' ? 1 : 0;
   const pausalne_dielo    = rv('vydavky_dielo')==='pausalne' ? 1 : 0;
   const pausalne_pouzitie = rv('vydavky_pouzitie')==='pausalne' ? 1 : 0;
-  const pausalne_12 = (pausalne_zivnost || pausalne_dielo) ? 1 : 0;
+  const pausalne_12 = (pausalne_zivnost || pausalne_poradca || pausalne_dielo) ? 1 : 0;
   const pausalne = (pausalne_12 || pausalne_pouzitie) ? 1 : 0;
 
-  // Výdavky paušál pre tabulka1b (60% zo živnosti)
-  const raw12 = (pausalne_zivnost ? C.p_zivnost*0.60 : 0) + (pausalne_dielo ? C.p_dielo*0.60 : 0);
+  // Výdavky paušál pre tabulka1b (60% zo živnosti + poradca + dielo)
+  const raw12 = (pausalne_zivnost ? C.p_zivnost*0.60 : 0) + (pausalne_poradca ? C.p_poradca*0.60 : 0) + (pausalne_dielo ? C.p_dielo*0.60 : 0);
   const cap12 = Math.min(raw12, 20000);
   const vydPauZivnost  = pausalne_zivnost && raw12 > 0 ? cap12 * (C.p_zivnost*0.60 / raw12) : 0;
+  const vydPauPoradca  = pausalne_poradca && raw12 > 0 ? cap12 * (C.p_poradca*0.60 / raw12) : 0;
   const vydPauDielo    = pausalne_dielo && raw12 > 0   ? cap12 * (C.p_dielo*0.60 / raw12)   : 0;
   const vydPauPouzitie = pausalne_pouzitie ? Math.min(C.p_pouzitie*0.60, 20000) : 0;
 
@@ -1349,8 +1491,8 @@ function buildXML() {
 \t\t\t<s2>${C.p_zivnost > 0 ? n2(C.vydavky_zivnost) : ''}</s2>
 \t\t</t1r2>
 \t\t<t1r3>
-\t\t\t<s1></s1>
-\t\t\t<s2></s2>
+\t\t\t<s1>${C.p_poradca > 0 ? n2(C.p_poradca) : ''}</s1>
+\t\t\t<s2>${C.p_poradca > 0 ? n2(C.vydavky_poradca) : ''}</s2>
 \t\t</t1r3>
 \t\t<t1r4><s1></s1><s2></s2></t1r4>
 \t\t<t1r5>
@@ -1363,21 +1505,24 @@ function buildXML() {
 \t\t<t1r9><s1></s1><s2></s2></t1r9>
 \t\t<t1r10>
 \t\t\t<s1>${n2(C.celk_prijmy_12)}</s1>
-\t\t\t<s2>${pausalne_12 ? n2(C.vydavky_zivnost + C.vydavky_dielo + C.celkove_odvody) : ''}</s2>
+\t\t\t<s2>${pausalne_12 ? n2(C.vydavky_zivnost + C.vydavky_poradca + C.vydavky_dielo + C.celkove_odvody) : ''}</s2>
 \t\t</t1r10>
-\t\t<t1r11><s1></s1><s2></s2></t1r11>
+\t\t<t1r11>
+\t\t\t<s1>${C.p_prenajom > 0 ? n2(C.p_prenajom) : ''}</s1>
+\t\t\t<s2>${C.p_prenajom > 0 ? n2(C.v_prenajom) : ''}</s2>
+\t\t</t1r11>
 \t\t<t1r12>
-			<s1>${C.p_pouzitie > 0 ? n2(C.p_pouzitie) : ''}</s1>
-			<s2>${C.p_pouzitie > 0 ? n2(C.vydavky_pouzitie) : ''}</s2>
-		</t1r12>
+\t\t\t<s1>${C.p_pouzitie > 0 ? n2(C.p_pouzitie) : ''}</s1>
+\t\t\t<s2>${C.p_pouzitie > 0 ? n2(C.vydavky_pouzitie) : ''}</s2>
+\t\t</t1r12>
 \t\t<t1r13>
-\t\t\t<s1>${C.celk_prijmy_4 > 0 ? n2(C.celk_prijmy_4) : ''}</s1>
-\t\t\t<s2>${C.celk_prijmy_4 > 0 ? n2(C.celk_vydavky_4) : ''}</s2>
+\t\t\t<s1>${C.celk_prijmy_34 > 0 ? n2(C.celk_prijmy_34) : ''}</s1>
+\t\t\t<s2>${C.celk_prijmy_34 > 0 ? n2(C.celk_vydavky_34) : ''}</s2>
 \t\t</t1r13>
 \t</tabulka1>
 \t<mikrodanovnikPar2w>0</mikrodanovnikPar2w>
 \t<vydavkyPar6ods11_ods1a2>0</vydavkyPar6ods11_ods1a2>
-\t<vydavkyPar6ods11_ods3>0</vydavkyPar6ods11_ods3>
+\t<vydavkyPar6ods11_ods3>${C.p_prenajom > 0 ? 1 : 0}</vydavkyPar6ods11_ods3>
 \t<vydavkyPar6ods11_ods4>0</vydavkyPar6ods11_ods4>
 \t<vydavkyPar6ods10_ods1a2>${pausalne_12}</vydavkyPar6ods10_ods1a2>
 \t<vydavkyPar6ods10_ods4>${pausalne_pouzitie}</vydavkyPar6ods10_ods4>
@@ -1415,8 +1560,8 @@ function buildXML() {
 \t<r55>${n2(C.czd_6)}</r55>
 \t<r56></r56>
 \t<r57>${n2(C.czd_6)}</r57>
-\t<r58>${C.celk_prijmy_4 > 0 ? n2(C.celk_prijmy_4) : ''}</r58><r59>${C.celk_prijmy_4 > 0 ? n2(C.celk_vydavky_4) : ''}</r59><r60>${C.czd_6_4 > 0 ? n2(C.czd_6_4) : ''}</r60>
-\t<r61></r61><r62></r62><r63></r63><r64></r64><r65>${C.czd_6_4 > 0 ? n2(C.czd_6_4) : ''}</r65>
+\t<r58>${C.celk_prijmy_34 > 0 ? n2(C.celk_prijmy_34) : ''}</r58><r59>${C.celk_prijmy_34 > 0 ? n2(C.celk_vydavky_34) : ''}</r59><r60>${C.czd_6_34 > 0 ? n2(C.czd_6_34) : ''}</r60>
+\t<r61></r61><r62></r62><r63></r63><r64></r64><r65>${C.czd_6_34 > 0 ? n2(C.czd_6_34) : ''}</r65>
 \t<tabulka2>
 \t\t<t2r1><s1></s1><s2></s2></t2r1><t2r2><s1></s1><s2></s2></t2r2>
 \t\t<t2r3><s1></s1><s2></s2></t2r3><t2r4><s1></s1><s2></s2></t2r4>
@@ -1465,7 +1610,7 @@ function buildXML() {
 \t<r108></r108><r109></r109><r110></r110><r111></r111>
 \t<r112></r112><r113></r113><r114></r114><r115></r115>
 \t<r116>${n2(C.dan)}</r116>
-\t<r116a>${n2(C.czd_5 + Math.max(C.czd_6, C.zd_b))}</r116a>
+\t<r116a></r116a>
 \t<r117>${C.bonus > 0 ? n2(C.bonus) : ''}</r117>
 \t<r118>${n2(C.dan_po_bonuse)}</r118>
 \t<r119></r119><r120></r120>
@@ -1601,21 +1746,29 @@ async function generatePDF() {
     ['ČZD §5 (r.38)',fmt(C.czd_5),true],
     ['Zrazené preddavky na daň (r.39)',fmt(C.celk_pred5),false],
     ['PRÍJMY Z PODNIKANIA §6','',true],
-    ['Príjmy zo živnosti §6 ods.1 (r.02)',fmt(C.p_zivnost),false],
+    ['Príjmy zo živnosti §6 ods.1 písm.b (r.02)',fmt(C.p_zivnost),false],
+    ...(C.p_poradca > 0 ? [['Podnikanie podľa os. predpisov §6 ods.1 písm.c (r.03)',fmt(C.p_poradca),false]] : []),
     ['Z vytvorenia diela §6 ods.2 (r.05)',fmt(C.p_dielo),false],
     ['Výdavky §6 ods.1+2 (paušál + odvody)',fmt(C.celk_vydavky_12),false],
     ['ČZD §6 ods.1+2 (r.55)',fmt(C.czd_6),true],
     ...(C.p_pouzitie > 0 ? [
     ['Z použitia diela §6 ods.4 (r.12)',fmt(C.p_pouzitie),false],
-    ['ČZD §6 ods.4 (r.65)',fmt(C.czd_6_4),true],
+    ['Výdavky §6 ods.4',fmt(C.vydavky_pouzitie),false],
     ] : []),
-    
+    ...(C.p_prenajom > 0 ? [
+    ['Prenájom nehnuteľností §6 ods.3 (r.11)',fmt(C.p_prenajom),false],
+    ['Výdavky §6 ods.3 (preukázateľné)',fmt(C.v_prenajom),false],
+    ] : []),
+    ...(C.czd_6_34 > 0 ? [
+    ['ČZD §6 ods.3+4 (r.60)',fmt(C.czd_6_34),true],
+    ] : []),
+
     ['NEZDANITEĽNÉ ČASTI (§11)','',true],
     ['NČZD na daňovníka (r.73)',fmt(C.nczd_dankovnik_suma),false],
     ['NČZD na manžela/ku (r.74)',fmt(C.nczd_manzel),false],
     ['III. pilier – max 180 € (r.75)',fmt(C.iii),false],
     ['VÝPOČET DANE','',true],
-    ['ZD §4a – §5 + §6/4 po NČZD (r.80)',fmt(C.zd_a),false],
+    ['ZD §4a – §5 + §6/3+4 po NČZD (r.80)',fmt(C.zd_a),false],
     ['Daň §4a – 19%/25% (r.81)',fmt(C.dan_a),false],
     ['ZD §4b – §6 ods.1+2 po NČZD (r.92)',fmt(C.zd_b),false],
     [`Daň §4b – ${C.sadzba_b} (r.96)`,fmt(C.dan_b),false],
@@ -1688,9 +1841,21 @@ async function generatePDF() {
           </div>
         </div>
       </div>
-      <div style="margin-top:16px;font-size:9px;color:#aaa;border-top:1px solid #eee;padding-top:10px;">
-        * Informatívny súhrn. Pre podanie použite XML export na Portáli finančnej správy.<br>
-        Vygenerované: Helwitax DPFO-B aplikácia | helwitax.sk
+      <div style="font-size:8.5px;color:#aaa;margin-top:16px;line-height:1.4;">
+        * Informatívny súhrn vypočítaný na základe zadaných údajov. Nenahradza daňové poradenstvo.
+        Pre podanie použite XML export na Portáli finančnej správy.
+      </div>
+      <div style="margin-top:12px;position:relative;overflow:hidden;border-radius:12px;background:linear-gradient(135deg,#321941 0%,#4a2a66 100%);">
+        <svg style="position:absolute;right:-10px;bottom:-60px;width:180px;height:auto;opacity:.06;" viewBox="0 0 400 2500" xmlns="http://www.w3.org/2000/svg"><path fill="#fff" d="M400,2500h-122.05l-.18-1391.23c-2.75-50.83-65.08-95.23-113.72-111.69l-87.52-29.92C21.99,948.69,0,909.97,0,852.39V0h120.86v831.23c0,53.63,34.26,110.2,85.05,127.41l101.45,29.59c52.42,17.75,89.91,72.43,92.64,127.26v1384.51Z"/></svg>
+        <div style="position:relative;z-index:1;padding:20px 24px;display:flex;align-items:center;gap:18px;">
+          <svg style="height:20px;width:auto;flex-shrink:0;" viewBox="0 0 1000 377.73" xmlns="http://www.w3.org/2000/svg"><path fill="#fff" d="M758.7,165.66c-8.44-7.09-19.53-10.63-33.28-10.63-8.79,0-16.63,1.42-23.5,4.25-6.88,2.84-12.48,6.84-16.8,12.02-4.33,5.18-7.06,10.95-8.19,17.33l25.95,5.95c1.13-5.81,3.69-10.24,7.66-13.29,3.97-3.05,9-4.57,15.1-4.57s10.53,1.35,14.14,4.04c3.62,2.69,5.42,6.31,5.42,10.85,0,2.98-.89,5.21-2.66,6.7-1.77,1.49-4.57,2.38-8.4,2.66l-18.93,1.91c-11.91,1.14-21.8,4.43-29.67,9.89-7.87,5.46-11.8,13.72-11.8,24.78,0,6.24,1.52,11.73,4.57,16.48,3.05,4.75,7.26,8.37,12.65,10.85,5.39,2.48,11.48,3.72,18.29,3.72,8.22,0,15.63-1.77,22.23-5.32,5.49-2.95,10.05-6.74,13.72-11.36v14.55h26.16v-70.19c0-13.33-4.22-23.53-12.65-30.63ZM741.15,233.51c-2.69,4.25-6.31,7.69-10.85,10.32-4.54,2.63-9.5,3.93-14.89,3.93-4.82,0-8.61-1.1-11.38-3.3-2.76-2.2-4.15-5.21-4.15-9.04,0-3.54,1.35-6.45,4.04-8.72,2.69-2.27,6.38-3.69,11.06-4.25l19.35-2.34c3.97-.28,6.91-.85,8.83-1.7.76-.34,1.43-.75,2.02-1.25v2.95c0,4.68-1.35,9.15-4.04,13.4Z"/><path fill="#fff" d="M865.27,223.46c-6.16-5.1-11.2-8.24-15.61-10.48l41.23-55.6h-29.78l-31.67,46.32c-1.52-.96-3.08-2.08-4.72-3.42-8.7-7.17-16.81-42.37-16.81-42.37h-27.42s12.88,34.49,23.45,42.72c6.94,5.4,12.4,8.46,16.98,10.49l-41.06,55.36h29.99l31.51-46.3c1.27,1,2.58,2.18,3.96,3.63,7.63,8,18.64,42.37,18.64,42.37h26.58s-15.01-34.22-25.28-42.72Z"/><path fill="#fff" d="M109.11,166.46l.04,100.03h26.16v-67.73c0-.49-.01-6.02-.04-6.5-.59-11.89-14.8-21.96-26.16-25.81Z"/><path fill="#fff" d="M175.74,164.64c-5.46-1.72-16.57-4.55-21.99-6.41-11.3-3.88-18.44-15.99-18.44-27.62v-21.5h-26.16l-.04,23.11c0,12.48,4.77,20.86,16.59,24.88,4.75,1.62,14.16,5.08,18.97,6.49,11.21,3.27,24.65,14,24.65,24.21l.04,78.69h26.17l.29-74.26c0-11.81-8.64-23.98-20.08-27.59Z"/><path fill="#fff" d="M291.4,233.42c-2.43,3.34-5.43,6.07-8.98,8.19-5,2.98-9.45,4.47-15.83,4.47s-10.62-1.49-15.62-4.47c-5-2.98-8.88-7.05-11.66-12.23-1.41-2.63-2.46-5.43-3.15-8.4h82.69c1.67-11.91.28-22.9-4.16-32.97-4.44-10.07-11.17-18.08-20.19-24.03-9.02-5.96-18.05-8.93-29.57-8.93-10.41,0-18.64,2.48-27.17,7.44-8.54,4.96-15.27,11.8-20.19,20.52-4.93,8.72-7.39,18.33-7.39,28.82s2.5,20.1,7.5,28.82c5,8.72,11.87,15.56,20.61,20.52,8.74,4.96,17.14,7.44,27.69,7.44,11.24,0,20.02-2.69,28.84-8.08,5.65-3.45,10.45-7.66,14.42-12.62l-17.82-14.5ZM239.21,194.39c2.71-5.24,6.45-9.36,11.24-12.34,4.79-2.98,8.78-4.47,14.47-4.47s9.58,1.35,14.16,4.04c4.58,2.7,8.19,6.45,10.83,11.27,1.35,2.47,2.41,5.1,3.18,7.87h-56.42c.64-2.21,1.48-4.34,2.54-6.38Z"/><path fill="#fff" d="M362.7,239.49c-2.69-2.69-4.04-7.03-4.04-12.98v-117.41h-26.16v115.92c0,14.03,3.51,24.46,10.52,31.26,3.99,3.86,9.2,6.64,15.63,8.3,4.88,1.28,10.49,1.92,16.8,1.92h8.73v-22.97h-8.73c-5.81,0-10.07-1.35-12.76-4.04Z"/><path fill="#fff" d="M502.43,239.47l-24.75-82.3h-26.59l-24.86,82.12-19.21-65.58c-2.87-9.8-11.87-16.54-22.08-16.54h-10.2l35.94,109.32h28.71l24.14-71.29,24.14,71.29h28.71l35.94-109.32h-25.95l-23.95,82.3Z"/><rect fill="#fff" x="565.08" y="157.17" width="26.16" height="109.32"/><path fill="#fff" d="M565.08,128.29c0,8.78,7.12,15.9,15.9,15.9h10.26v-28.7h-26.16v12.8Z"/><path fill="#fff" d="M637.77,115.49l-9.22,2.85c-10.07,3.11-16.94,12.42-16.94,22.96v83.72c0,14.04,3.51,24.46,10.53,31.26,7.02,6.81,17.83,10.21,32.43,10.21h8.73v-22.97h-8.73c-5.82,0-10.07-1.35-12.76-4.04-2.69-2.69-4.04-7.02-4.04-12.97v-46.15h25.54v-23.18h-25.54v-41.69Z"/></svg>
+          <div style="width:1px;height:36px;background:rgba(255,255,255,.2);flex-shrink:0;"></div>
+          <div style="flex:1;">
+            <div style="font-size:10px;color:rgba(255,255,255,.92);font-weight:600;">Digitárium finančných riešení</div>
+            <div style="font-size:8.5px;color:rgba(255,255,255,.5);margin-top:3px;">Vypočítané v aplikácii DPFO Typ B 2025 &nbsp;|&nbsp; ${now}</div>
+          </div>
+          <div style="font-size:10px;color:rgba(255,255,255,.7);font-weight:700;letter-spacing:.03em;flex-shrink:0;">helwitax.sk</div>
+        </div>
       </div>
     </div>`;
 

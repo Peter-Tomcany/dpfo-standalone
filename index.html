@@ -583,6 +583,104 @@
           </div>
         </div>
         <div id="vysledok_prijmy" style="margin-top:8px"></div>
+
+        <!-- TABUĽKA č. 1a / 1b – dynamicky podľa typu výdavkov -->
+        <div id="tab1ab_wrapper" style="margin-top:18px;display:none">
+
+          <!-- TAB. 1b – paušálne výdavky -->
+          <div id="tab1b_block">
+            <div class="sub-header section-header" style="background:rgba(62,207,142,.06)">
+              <span class="section-tag" style="background:rgba(62,207,142,.15);color:#00695c">TAB. 1b</span>
+              <span class="section-title" style="font-size:12px">Údaje daňovníka – paušálne výdavky §6 ods.10</span>
+            </div>
+            <div style="margin-top:8px;margin-bottom:8px;padding:8px 12px;background:rgba(62,207,142,.06);border-radius:8px;font-size:11.5px;color:#555;line-height:1.5">
+              Vypĺňa sa ak uplatňujete <strong>paušálne výdavky</strong> (§6 ods.10). Polia môžu zostať prázdne.
+            </div>
+            <table class="sum-table" style="margin-top:8px;font-size:12px">
+              <thead>
+                <tr style="background:var(--surface2)">
+                  <th style="width:30px;text-align:center">R.</th>
+                  <th style="text-align:left">Druh</th>
+                  <th style="width:160px;text-align:center">Na začiatku ZO</th>
+                  <th style="width:160px;text-align:center">Na konci ZO</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="text-align:center;font-weight:700">1</td>
+                  <td>Zásoby</td>
+                  <td><input type="number" id="t1b_r1_s1" value="" min="0" step="0.01" style="width:100%;text-align:right" oninput="calc()"></td>
+                  <td><input type="number" id="t1b_r1_s2" value="" min="0" step="0.01" style="width:100%;text-align:right" oninput="calc()"></td>
+                </tr>
+                <tr>
+                  <td style="text-align:center;font-weight:700">2</td>
+                  <td>Pohľadávky</td>
+                  <td><input type="number" id="t1b_r2_s1" value="" min="0" step="0.01" style="width:100%;text-align:right" oninput="calc()"></td>
+                  <td><input type="number" id="t1b_r2_s2" value="" min="0" step="0.01" style="width:100%;text-align:right" oninput="calc()"></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- TAB. 1a – preukázateľné výdavky / prenájom -->
+          <div id="tab1a_block" style="display:none">
+            <div class="sub-header section-header" style="background:rgba(255,152,0,.06)">
+              <span class="section-tag" style="background:rgba(255,152,0,.15);color:#e65100">TAB. 1a</span>
+              <span class="section-title" style="font-size:12px">Údaje daňovníka – majetok a záväzky (§6 ods.11 / §6 ods.13)</span>
+            </div>
+            <div style="margin-top:8px;margin-bottom:8px;padding:8px 12px;background:rgba(255,152,0,.06);border-radius:8px;font-size:11.5px;color:#555;line-height:1.5">
+              Vypĺňa sa ak vediete <strong>daňovú evidenciu</strong> (§6 ods.11) alebo <strong>účtovníctvo</strong> (§6 ods.13). Polia môžu zostať prázdne.
+            </div>
+            <table class="sum-table" style="margin-top:8px;font-size:12px">
+              <thead>
+                <tr style="background:var(--surface2)">
+                  <th style="width:30px;text-align:center">R.</th>
+                  <th style="text-align:left">Druh</th>
+                  <th style="width:160px;text-align:center">Na začiatku ZO</th>
+                  <th style="width:160px;text-align:center">Na konci ZO</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="text-align:center;font-weight:700">1</td>
+                  <td>Zostatková cena hmotného majetku</td>
+                  <td><input type="number" id="t1a_r1_s1" value="" min="0" step="0.01" style="width:100%;text-align:right" oninput="calc()"></td>
+                  <td><input type="number" id="t1a_r1_s2" value="" min="0" step="0.01" style="width:100%;text-align:right" oninput="calc()"></td>
+                </tr>
+                <tr>
+                  <td style="text-align:center;font-weight:700">2</td>
+                  <td>Zostatková cena nehmotného majetku</td>
+                  <td><input type="number" id="t1a_r2_s1" value="" min="0" step="0.01" style="width:100%;text-align:right" oninput="calc()"></td>
+                  <td><input type="number" id="t1a_r2_s2" value="" min="0" step="0.01" style="width:100%;text-align:right" oninput="calc()"></td>
+                </tr>
+                <tr>
+                  <td style="text-align:center;font-weight:700">3</td>
+                  <td>Zásoby</td>
+                  <td><input type="number" id="t1a_r3_s1" value="" min="0" step="0.01" style="width:100%;text-align:right" oninput="calc()"></td>
+                  <td><input type="number" id="t1a_r3_s2" value="" min="0" step="0.01" style="width:100%;text-align:right" oninput="calc()"></td>
+                </tr>
+                <tr>
+                  <td style="text-align:center;font-weight:700">4</td>
+                  <td>Pohľadávky</td>
+                  <td><input type="number" id="t1a_r4_s1" value="" min="0" step="0.01" style="width:100%;text-align:right" oninput="calc()"></td>
+                  <td><input type="number" id="t1a_r4_s2" value="" min="0" step="0.01" style="width:100%;text-align:right" oninput="calc()"></td>
+                </tr>
+                <tr>
+                  <td style="text-align:center;font-weight:700">5</td>
+                  <td>Záväzky</td>
+                  <td><input type="number" id="t1a_r5_s1" value="" min="0" step="0.01" style="width:100%;text-align:right" oninput="calc()"></td>
+                  <td><input type="number" id="t1a_r5_s2" value="" min="0" step="0.01" style="width:100%;text-align:right" oninput="calc()"></td>
+                </tr>
+                <tr>
+                  <td style="text-align:center;font-weight:700">6</td>
+                  <td>Finančný majetok</td>
+                  <td><input type="number" id="t1a_r6_s1" value="" min="0" step="0.01" style="width:100%;text-align:right" oninput="calc()"></td>
+                  <td><input type="number" id="t1a_r6_s2" value="" min="0" step="0.01" style="width:100%;text-align:right" oninput="calc()"></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
     </div>
     <div class="btn-row">
@@ -896,22 +994,43 @@ function toggleAcc(id) {
 function toggleSkutocne() {
   const val = document.querySelector('[name="vydavky_zivnost"]:checked')?.value;
   document.getElementById('skutocne_zivnost').style.display = val==='skutocne' ? 'block' : 'none';
-  calc();
+  calc(); updateTab1ab();
 }
 function toggleSkutocneDielo() {
   const val = document.querySelector('[name="vydavky_dielo"]:checked')?.value;
   document.getElementById('skutocne_dielo').style.display = val==='skutocne' ? 'block' : 'none';
-  calc();
+  calc(); updateTab1ab();
 }
 function toggleSkutocnePoradca() {
   const val = document.querySelector('[name="vydavky_poradca"]:checked')?.value;
   document.getElementById('skutocne_poradca').style.display = val==='skutocne' ? 'block' : 'none';
-  calc();
+  calc(); updateTab1ab();
 }
 function toggleSkutocnePouzitie() {
   const val = document.querySelector('[name="vydavky_pouzitie"]:checked')?.value;
   document.getElementById('skutocne_pouzitie').style.display = val==='skutocne' ? 'block' : 'none';
-  calc();
+  calc(); updateTab1ab();
+}
+
+// ——— TAB. 1a / 1b SWITCHING ———
+function updateTab1ab() {
+  const hasPrijmy6 = v('p_zivnost') > 0 || v('p_poradca') > 0 || v('p_dielo') > 0 || v('p_pouzitie') > 0 || v('p_prenajom') > 0;
+  const wrapper = document.getElementById('tab1ab_wrapper');
+  if(!wrapper) return;
+  wrapper.style.display = hasPrijmy6 ? 'block' : 'none';
+  if(!hasPrijmy6) return;
+
+  // Ak má prenájom (§6 ods.3) → vždy 1a (paušál nie je možný pri prenájme)
+  const hasPrenajom = v('p_prenajom') > 0;
+  // Ak má aspoň jednu kategóriu so skutočnými výdavkami → 1a
+  const skutZivnost  = rv('vydavky_zivnost')==='skutocne'  && v('p_zivnost') > 0;
+  const skutPoradca  = rv('vydavky_poradca')==='skutocne'  && v('p_poradca') > 0;
+  const skutDielo    = rv('vydavky_dielo')==='skutocne'    && v('p_dielo') > 0;
+  const skutPouzitie = rv('vydavky_pouzitie')==='skutocne' && v('p_pouzitie') > 0;
+  const needTab1a = hasPrenajom || skutZivnost || skutPoradca || skutDielo || skutPouzitie;
+
+  document.getElementById('tab1b_block').style.display = needTab1a ? 'none' : 'block';
+  document.getElementById('tab1a_block').style.display = needTab1a ? 'block' : 'none';
 }
 
 // ——— HELPERS ———
@@ -1289,6 +1408,7 @@ function drawBurdenChart() {
       <span style="font-size:13px;font-weight:800;color:var(--purple)">${fmt2(statCelkom)} <span style="color:var(--muted);font-size:11px">(${pct.toFixed(1)}%)</span></span>
     </div>
   `;
+  updateTab1ab();
 }
 function calcAsig() {
   const perc = parseFloat(document.getElementById('asig_percento').value) || 0;
@@ -1543,16 +1663,16 @@ function buildXML() {
 \t<ukoncujemUplatnovaniePar17ods17_ods1a2>0</ukoncujemUplatnovaniePar17ods17_ods1a2>
 \t<ukoncujemUplatnovaniePar17ods17_ods3a4>0</ukoncujemUplatnovaniePar17ods17_ods3a4>
 \t<tabulka1a>
-\t\t<t1r1><s1></s1><s2></s2></t1r1>
-\t\t<t1r2><s1></s1><s2></s2></t1r2>
-\t\t<t1r3><s1></s1><s2></s2></t1r3>
-\t\t<t1r4><s1></s1><s2></s2></t1r4>
-\t\t<t1r5><s1></s1><s2></s2></t1r5>
-\t\t<t1r6><s1></s1><s2></s2></t1r6>
+\t\t<t1r1><s1>${n2(v("t1a_r1_s1"))}</s1><s2>${n2(v("t1a_r1_s2"))}</s2></t1r1>
+\t\t<t1r2><s1>${n2(v("t1a_r2_s1"))}</s1><s2>${n2(v("t1a_r2_s2"))}</s2></t1r2>
+\t\t<t1r3><s1>${n2(v("t1a_r3_s1"))}</s1><s2>${n2(v("t1a_r3_s2"))}</s2></t1r3>
+\t\t<t1r4><s1>${n2(v("t1a_r4_s1"))}</s1><s2>${n2(v("t1a_r4_s2"))}</s2></t1r4>
+\t\t<t1r5><s1>${n2(v("t1a_r5_s1"))}</s1><s2>${n2(v("t1a_r5_s2"))}</s2></t1r5>
+\t\t<t1r6><s1>${n2(v("t1a_r6_s1"))}</s1><s2>${n2(v("t1a_r6_s2"))}</s2></t1r6>
 \t</tabulka1a>
 \t<tabulka1b>
-\t\t<t1r1><s1></s1><s2></s2></t1r1>
-\t\t<t1r2><s1></s1><s2></s2></t1r2>
+\t\t<t1r1><s1>${n2(v("t1b_r1_s1"))}</s1><s2>${n2(v("t1b_r1_s2"))}</s2></t1r1>
+\t\t<t1r2><s1>${n2(v("t1b_r2_s1"))}</s1><s2>${n2(v("t1b_r2_s2"))}</s2></t1r2>
 \t</tabulka1b>
 \t<r39>${n2(C.celk_prijmy_12)}</r39>
 \t<r40>${n2(C.celk_vydavky_12)}</r40>

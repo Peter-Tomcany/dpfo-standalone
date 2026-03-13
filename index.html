@@ -1301,10 +1301,17 @@ function calcAsig() {
     if(boxUpl)   boxUpl.style.display   = 'none';
     buildSummary(); return;
   }
+  const dan = C.dan_po_bonuse || 0;
+  const sumaRaw = Math.round(dan * perc) / 100;
+  if(sumaRaw < 3) {
+    el.innerHTML = `<div class="computed-row" style="border-color:rgba(192,57,43,.3);background:rgba(192,57,43,.08)"><span class="computed-label" style="color:#c0392b">Suma asignácie ${sumaRaw.toFixed(2)} € je nižšia ako minimum 3 € – asignáciu nie je možné uplatniť</span></div>`;
+    if(boxNeupl) boxNeupl.style.display = 'flex';
+    if(boxUpl)   boxUpl.style.display   = 'none';
+    buildSummary(); return;
+  }
   if(boxNeupl) boxNeupl.style.display = 'none';
   if(boxUpl)   boxUpl.style.display   = 'flex';
-  const dan = C.dan_po_bonuse || 0;
-  const suma = Math.max(3, Math.round(dan * perc) / 100);
+  const suma = sumaRaw;
   el.innerHTML = `<div class="computed-row"><span class="computed-label">Suma asignácie (r.152) – min. 3 €</span><span class="computed-value highlight">${suma.toFixed(2)} €</span></div>`;
   buildSummary();
 }
@@ -1356,13 +1363,15 @@ function buildXML() {
   const asigIco  = getVal('asig_ico').trim();
   const asigNazov= getVal('asig_nazov').trim();
   const asigSuhlas = getVal('asig_suhlas') || '0';
-  const asigSuma = asigPerc > 0 ? Math.max(3, Math.round((C.dan_po_bonuse||0) * asigPerc) / 100).toFixed(2) : '';
-  const splnam3 = asigPerc === 3 ? 1 : 0;
-  const neuplatnujem = asigPerc === 0 ? 1 : 0;
-  const pausalne_zivnost  = rv('vydavky_zivnost')==='pausalne' ? 1 : 0;
-  const pausalne_poradca  = rv('vydavky_poradca')==='pausalne' ? 1 : 0;
-  const pausalne_dielo    = rv('vydavky_dielo')==='pausalne' ? 1 : 0;
-  const pausalne_pouzitie = rv('vydavky_pouzitie')==='pausalne' ? 1 : 0;
+  const asigSumaRaw = asigPerc > 0 ? Math.round((C.dan_po_bonuse||0) * asigPerc) / 100 : 0;
+  const asigMozna = asigPerc > 0 && asigSumaRaw >= 3;
+  const asigSuma = asigMozna ? asigSumaRaw.toFixed(2) : '';
+  const splnam3 = (asigPerc === 3 && asigMozna) ? 1 : 0;
+  const neuplatnujem = (!asigMozna) ? 1 : 0;
+  const pausalne_zivnost  = (rv('vydavky_zivnost')==='pausalne' && C.p_zivnost > 0) ? 1 : 0;
+  const pausalne_poradca  = (rv('vydavky_poradca')==='pausalne' && C.p_poradca > 0) ? 1 : 0;
+  const pausalne_dielo    = (rv('vydavky_dielo')==='pausalne' && C.p_dielo > 0) ? 1 : 0;
+  const pausalne_pouzitie = (rv('vydavky_pouzitie')==='pausalne' && C.p_pouzitie > 0) ? 1 : 0;
   const pausalne_12 = (pausalne_zivnost || pausalne_poradca || pausalne_dielo) ? 1 : 0;
   const pausalne = (pausalne_12 || pausalne_pouzitie) ? 1 : 0;
 
@@ -1634,8 +1643,8 @@ function buildXML() {
 \t\t<ico>${esc(asigIco)}</ico>
 \t\t<splnam3per>${splnam3}</splnam3per>
 \t\t<neuplatnujemPar50>${neuplatnujem}</neuplatnujemPar50>
-\t\t<obchodneMeno><riadok><![CDATA[${asigNazov}]]></riadok></obchodneMeno>
-\t\t<suhlasSoZaslanim>${asigPerc > 0 ? asigSuhlas : 0}</suhlasSoZaslanim>
+\t\t<obchodneMeno><riadok><![CDATA[${asigMozna ? asigNazov : ""}]]></riadok></obchodneMeno>
+\t\t<suhlasSoZaslanim>${asigMozna ? asigSuhlas : 0}</suhlasSoZaslanim>
 \t</r151>
 \t<r152>${asigSuma}</r152>
 \t<r153>
@@ -1739,7 +1748,9 @@ async function generatePDF() {
   const dic = document.getElementById('dic').value;
   const now = new Date().toLocaleDateString('sk-SK');
   const asigPerc2 = parseFloat(document.getElementById('asig_percento').value) || 0;
-  const asigSuma2 = asigPerc2 > 0 ? Math.max(3, Math.round((C.dan_po_bonuse||0) * asigPerc2) / 100).toFixed(2) : '';
+  const asigSumaRaw2 = asigPerc2 > 0 ? Math.round((C.dan_po_bonuse||0) * asigPerc2) / 100 : 0;
+  const asigMozna2 = asigPerc2 > 0 && asigSumaRaw2 >= 3;
+  const asigSuma2 = asigMozna2 ? asigSumaRaw2.toFixed(2) : '';
 
   const rows = [
     ['PRÍJMY ZO ZÁVISLEJ ČINNOSTI §5','',true],
@@ -1779,7 +1790,7 @@ async function generatePDF() {
     ['Zrazené preddavky §5 (r.131)','−'+fmt(C.celk_pred5),false],
     [C.dan_na_uhradu>0?'DAŇ NA ÚHRADU (r.135)':'DAŇOVÝ PREPLATOK (r.136)',
      C.dan_na_uhradu>0?fmt(C.dan_na_uhradu):fmt(C.preplatok),true],
-    ...(asigPerc2 > 0 ? [['Asignácia '+asigPerc2+'% §50 (r.152)', asigSuma2+' €', false]] : []),
+    ...(asigMozna2 ? [['Asignácia '+asigPerc2+'% §50 (r.152)', asigSuma2+' €', false]] : (asigPerc2 > 0 ? [['Asignácia §50 – suma pod 3 € (neuplatnená)', '', false]] : [])),
   ];
 
   // Burden calc for PDF

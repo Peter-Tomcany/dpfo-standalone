@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>DPFO Typ B 2025 – Helwitax</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/decimal.js/10.4.3/decimal.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Cabinet+Grotesk:wght@300;400;500;700;800&display=swap" rel="stylesheet">
@@ -277,7 +278,7 @@
           <div class="field"><label>Titul za</label><input type="text" id="titul_za" placeholder=""></div>
         </div>
         <div class="grid grid-3" style="margin-bottom:16px">
-          <div class="field"><label>Rodné číslo (r.09)</label><input type="text" id="rc" placeholder="800101/1234"></div>
+          <div class="field"><label>Rodné číslo (r.09)</label><input type="text" id="rc" placeholder="800101/1234" oninput="validateRC(this)" maxlength="11"><span id="rc_err" style="display:none;color:#c0392b;font-size:11px;margin-top:2px"></span></div>
           <div class="field"><label>Dátum narodenia</label><input type="date" id="datnar"></div>
           <div class="field"><label>Štát rezidencie</label><input type="text" id="stat" value="SR"></div>
         </div>
@@ -1012,6 +1013,76 @@ function toggleSkutocnePouzitie() {
   calc(); updateTab1ab();
 }
 
+// ——— VALIDÁCIA RODNÉHO ČÍSLA ———
+// Logika podľa https://github.com/kub1x/rodnecislo (MIT licencia)
+function validateRC(el) {
+  const errEl = document.getElementById('rc_err');
+  const raw = el.value.replace(/\s/g, '');
+  // Auto-formátovanie: pridaj lomku po 6 znakoch
+  if(/^\d{7,}$/.test(raw) && !raw.includes('/')) {
+    el.value = raw.slice(0,6) + '/' + raw.slice(6);
+  }
+  const val = el.value.replace(/\s/g, '');
+  if(!val) { errEl.style.display='none'; el.style.borderColor=''; return; }
+
+  const m = val.match(/^(\d{6})\/?(\d{3,4})$/);
+  if(!m) {
+    errEl.textContent = 'Formát: YYMMDD/SSSC (9–10 číslic)';
+    errEl.style.display='block'; el.style.borderColor='#c0392b'; return;
+  }
+  const [, datePart, seqPart] = m;
+  const is10digit = seqPart.length === 4;
+
+  // Modulo 11 kontrola (len pre 10-miestne, t.j. narodení po 1.1.1954)
+  if(is10digit) {
+    const full = parseInt(datePart + seqPart, 10);
+    // Špeciálna výnimka: ak číslo bez poslednej cifry mod 11 = 10 a posledná cifra = 0
+    const withoutLast = parseInt(datePart + seqPart.slice(0,3), 10);
+    const lastDigit = parseInt(seqPart[3], 10);
+    const mod = full % 11;
+    if(mod !== 0) {
+      if(!(withoutLast % 11 === 10 && lastDigit === 0)) {
+        errEl.textContent = 'Neplatné rodné číslo (kontrola mod 11)';
+        errEl.style.display='block'; el.style.borderColor='#c0392b'; return;
+      }
+    }
+  }
+
+  // Parsovanie dátumu
+  let yy = parseInt(datePart.slice(0,2), 10);
+  let mm = parseInt(datePart.slice(2,4), 10);
+  const dd = parseInt(datePart.slice(4,6), 10);
+
+  // Ženy majú mesiac + 50, od 2004 možné +20 navyše
+  if(mm > 70) mm -= 70;       // žena + extra 20 (od 2004)
+  else if(mm > 50) mm -= 50;  // žena
+  else if(mm > 20) mm -= 20;  // muž + extra 20 (od 2004)
+
+  // Rok: 9-miestne = pred 1954, 10-miestne = 1954+
+  const year = is10digit ? (yy < 54 ? 2000 + yy : 1900 + yy) : 1900 + yy;
+
+  // Kontrola platnosti dátumu
+  const testDate = new Date(year, mm - 1, dd);
+  if(testDate.getFullYear() !== year || testDate.getMonth() !== mm - 1 || testDate.getDate() !== dd) {
+    errEl.textContent = 'Neplatný dátum narodenia v rodnom čísle';
+    errEl.style.display='block'; el.style.borderColor='#c0392b'; return;
+  }
+
+  // Ak dátum v budúcnosti
+  if(testDate > new Date()) {
+    errEl.textContent = 'Dátum narodenia je v budúcnosti';
+    errEl.style.display='block'; el.style.borderColor='#e67e22'; return;
+  }
+
+  // Auto-vyplnenie dátumu narodenia
+  const datnarEl = document.getElementById('datnar');
+  if(datnarEl && !datnarEl.value) {
+    datnarEl.value = `${year}-${String(mm).padStart(2,'0')}-${String(dd).padStart(2,'0')}`;
+  }
+
+  errEl.style.display='none'; el.style.borderColor='#27ae60';
+}
+
 // ——— TAB. 1a / 1b SWITCHING ———
 function updateTab1ab() {
   const hasPrijmy6 = v('p_zivnost') > 0 || v('p_poradca') > 0 || v('p_dielo') > 0 || v('p_pouzitie') > 0 || v('p_prenajom') > 0;
@@ -1037,6 +1108,11 @@ function updateTab1ab() {
 const v = id => parseFloat(document.getElementById(id)?.value)||0;
 const rv = name => document.querySelector(`[name="${name}"]:checked`)?.value;
 const fmt = n => n.toFixed(2).replace('.',',')+' €';
+
+// Decimal.js helpers – presná aritmetika pre daňové výpočty
+const D = x => new Decimal(x || 0);
+const R2 = d => d.toDecimalPlaces(2, Decimal.ROUND_HALF_UP);  // zaokrúhlenie na 2 des. miesta
+const N = d => d.toNumber();  // konverzia späť na JS number
 let C = {};
 
 // ——— MONTH HELPERS ———
@@ -1134,97 +1210,100 @@ function calc() {
 
   // Paušálne výdavky: 60% z príjmov, max 20 000 € SPOLU pre §6 ods.1+2 (§6 ods.10)
   // Spoločný limit zahŕňa živnosť (písm.b), osobitné predpisy (písm.c) aj dielo (ods.2)
+  // Výpočty cez Decimal.js pre presnú aritmetiku (žiadne float chyby)
   const pau_zivnost = rv('vydavky_zivnost')==='pausalne';
   const pau_poradca = rv('vydavky_poradca')==='pausalne';
   const pau_dielo   = rv('vydavky_dielo')==='pausalne';
   let vydavky_zivnost, vydavky_poradca, vydavky_dielo;
   if (pau_zivnost || pau_poradca || pau_dielo) {
-    const raw_z = pau_zivnost ? p_zivnost * 0.60 : 0;
-    const raw_p = pau_poradca ? p_poradca * 0.60 : 0;
-    const raw_d = pau_dielo   ? p_dielo * 0.60   : 0;
-    const raw_spolu = raw_z + raw_p + raw_d;
-    const capped = Math.min(raw_spolu, 20000);
-    vydavky_zivnost = pau_zivnost ? (raw_spolu > 0 ? capped * (raw_z / raw_spolu) : 0) : v('v_zivnost_skutocne');
-    vydavky_poradca = pau_poradca ? (raw_spolu > 0 ? capped * (raw_p / raw_spolu) : 0) : v('v_poradca_skutocne');
-    vydavky_dielo   = pau_dielo   ? (raw_spolu > 0 ? capped * (raw_d / raw_spolu) : 0) : v('v_dielo_skutocne');
+    const raw_z = pau_zivnost ? D(p_zivnost).times('0.60') : D(0);
+    const raw_p = pau_poradca ? D(p_poradca).times('0.60') : D(0);
+    const raw_d = pau_dielo   ? D(p_dielo).times('0.60')   : D(0);
+    const raw_spolu = raw_z.plus(raw_p).plus(raw_d);
+    const capped = Decimal.min(raw_spolu, 20000);
+    vydavky_zivnost = pau_zivnost ? (raw_spolu.gt(0) ? N(R2(capped.times(raw_z).div(raw_spolu))) : 0) : v('v_zivnost_skutocne');
+    vydavky_poradca = pau_poradca ? (raw_spolu.gt(0) ? N(R2(capped.times(raw_p).div(raw_spolu))) : 0) : v('v_poradca_skutocne');
+    vydavky_dielo   = pau_dielo   ? (raw_spolu.gt(0) ? N(R2(capped.times(raw_d).div(raw_spolu))) : 0) : v('v_dielo_skutocne');
   } else {
     vydavky_zivnost = v('v_zivnost_skutocne');
     vydavky_poradca = v('v_poradca_skutocne');
     vydavky_dielo   = v('v_dielo_skutocne');
   }
-  let vydavky_pouzitie = rv('vydavky_pouzitie')==='pausalne' ? Math.min(p_pouzitie*0.60, 20000) : v('v_pouzitie_skutocne');
+  let vydavky_pouzitie = rv('vydavky_pouzitie')==='pausalne' ? N(Decimal.min(D(p_pouzitie).times('0.60'), 20000)) : v('v_pouzitie_skutocne');
 
   // §6 ods.1 + ods.2 → §4b (r.02 + r.03 + r.05 = r.10)
-  const celk_prijmy_12 = p_zivnost + p_poradca + p_dielo;
-  const celk_vydavky_12 = vydavky_zivnost + vydavky_poradca + vydavky_dielo + celkove_odvody;
-  let czd_6 = Math.max(0, celk_prijmy_12 - celk_vydavky_12);
+  const celk_prijmy_12 = N(D(p_zivnost).plus(p_poradca).plus(p_dielo));
+  const celk_vydavky_12 = N(D(vydavky_zivnost).plus(vydavky_poradca).plus(vydavky_dielo).plus(celkove_odvody));
+  let czd_6 = N(Decimal.max(0, D(celk_prijmy_12).minus(celk_vydavky_12)));
 
   // §6 ods.3 – prenájom (iba preukázateľné výdavky)
   const celk_prijmy_3 = p_prenajom;
   const celk_vydavky_3 = v_prenajom;
-  let czd_6_3 = Math.max(0, celk_prijmy_3 - celk_vydavky_3);
+  let czd_6_3 = N(Decimal.max(0, D(celk_prijmy_3).minus(celk_vydavky_3)));
 
   // §6 ods.4
   const celk_prijmy_4 = p_pouzitie;
   const celk_vydavky_4 = vydavky_pouzitie;
-  let czd_6_4 = Math.max(0, celk_prijmy_4 - celk_vydavky_4);
+  let czd_6_4 = N(Decimal.max(0, D(celk_prijmy_4).minus(celk_vydavky_4)));
 
   // §6 ods.3+4 spolu (r.13 Tab.1 → r.58/r.59/r.60)
-  const celk_prijmy_34 = celk_prijmy_3 + celk_prijmy_4;
-  const celk_vydavky_34 = Math.min(celk_prijmy_34, celk_vydavky_3 + celk_vydavky_4);
-  let czd_6_34 = Math.max(0, celk_prijmy_34 - celk_vydavky_34);
+  const celk_prijmy_34 = N(D(celk_prijmy_3).plus(celk_prijmy_4));
+  const celk_vydavky_34 = N(Decimal.min(celk_prijmy_34, D(celk_vydavky_3).plus(celk_vydavky_4)));
+  let czd_6_34 = N(Decimal.max(0, D(celk_prijmy_34).minus(celk_vydavky_34)));
 
-  const celk_prijmy_6 = celk_prijmy_12 + celk_prijmy_34;
-  const celk_vydavky_6 = celk_vydavky_12 + celk_vydavky_34;
+  const celk_prijmy_6 = N(D(celk_prijmy_12).plus(celk_prijmy_34));
+  const celk_vydavky_6 = N(D(celk_vydavky_12).plus(celk_vydavky_34));
 
-  const uhrnZD_aktivny = czd_5 + czd_6;
+  const uhrnZD_aktivny = N(D(czd_5).plus(czd_6));
 
-  const NCZD_PLNA = 5753.79;
-  const NCZD_LIMIT = 25426.27;
+  const NCZD_PLNA = D('5753.79');
+  const NCZD_LIMIT = D('25426.27');
   let nczd_dankovnik_suma = 0;
   if(rv('nczd_dankovnik')==='ano') {
-    const doc = v('dochodok');
-    if(uhrnZD_aktivny <= NCZD_LIMIT) {
-      nczd_dankovnik_suma = Math.max(0, NCZD_PLNA - doc);
+    const doc = D(v('dochodok'));
+    if(D(uhrnZD_aktivny).lte(NCZD_LIMIT)) {
+      nczd_dankovnik_suma = N(Decimal.max(0, NCZD_PLNA.minus(doc)));
     } else {
-      const krat = 12110.36 - uhrnZD_aktivny/4;
-      nczd_dankovnik_suma = Math.max(0, krat - doc);
+      const krat = D('12110.36').minus(D(uhrnZD_aktivny).div(4));
+      nczd_dankovnik_suma = N(Decimal.max(0, krat.minus(doc)));
     }
   }
 
   const iii = Math.min(v('iii_pilier'), 180);
   const nczd_manzel = v('nczd_manzel');
-  const celk_nczd = nczd_dankovnik_suma + iii + nczd_manzel;
+  const celk_nczd = N(D(nczd_dankovnik_suma).plus(iii).plus(nczd_manzel));
 
-  let zd_5_po_nczd = Math.max(0, czd_5 - celk_nczd);
-  let nczd_zostatok_pre_6 = Math.max(0, celk_nczd - czd_5);
-  let zd_6_po_nczd = Math.max(0, czd_6 - nczd_zostatok_pre_6);
+  let zd_5_po_nczd = N(Decimal.max(0, D(czd_5).minus(celk_nczd)));
+  let nczd_zostatok_pre_6 = N(Decimal.max(0, D(celk_nczd).minus(czd_5)));
+  let zd_6_po_nczd = N(Decimal.max(0, D(czd_6).minus(nczd_zostatok_pre_6)));
 
-  const PASOM_A = 48441.43;
-  const zd_a = zd_5_po_nczd + czd_6_34;
-  let dan_a = zd_a <= PASOM_A ? zd_a * 0.19 : PASOM_A * 0.19 + (zd_a - PASOM_A) * 0.25;
+  const PASOM_A = D('48441.43');
+  const _zd_a = D(zd_5_po_nczd).plus(czd_6_34);
+  const zd_a = N(_zd_a);
+  let dan_a = N(R2(_zd_a.lte(PASOM_A) ? _zd_a.times('0.19') : PASOM_A.times('0.19').plus(_zd_a.minus(PASOM_A).times('0.25'))));
 
-  const zd_b = zd_6_po_nczd;
+  const _zd_b = D(zd_6_po_nczd);
+  const zd_b = N(_zd_b);
   let dan_b;
   if (celk_prijmy_12 <= 100000) {
-    dan_b = zd_b * 0.15;
+    dan_b = N(R2(_zd_b.times('0.15')));
   } else {
-    dan_b = zd_b <= PASOM_A ? zd_b * 0.19 : PASOM_A * 0.19 + (zd_b - PASOM_A) * 0.25;
+    dan_b = N(R2(_zd_b.lte(PASOM_A) ? _zd_b.times('0.19') : PASOM_A.times('0.19').plus(_zd_b.minus(PASOM_A).times('0.25'))));
   }
 
-  const dan = dan_a + dan_b;
-  const zd_po_nczd = zd_a + zd_b;
+  const dan = N(R2(D(dan_a).plus(dan_b)));
+  const zd_po_nczd = N(D(zd_a).plus(zd_b));
   const sadzba_b = celk_prijmy_12 <= 100000 ? '15%' : '19%/25%';
   C.sadzba_b = sadzba_b; C.dan_a = dan_a; C.dan_b = dan_b; C.zd_a = zd_a; C.zd_b = zd_b;
 
-  const bonus_limit = uhrnZD_aktivny * 0.55;
+  const bonus_limit = N(R2(D(uhrnZD_aktivny).times('0.55')));
   const bonus_raw = calcBonusRaw();
-  const bonus = Math.min(bonus_raw, bonus_limit);
-  let dan_po_bonuse = Math.max(0, dan - bonus);
+  const bonus = N(Decimal.min(bonus_raw, bonus_limit));
+  let dan_po_bonuse = N(Decimal.max(0, D(dan).minus(bonus)));
 
   const celk_pred5 = C.celk_pred5 || 0;
-  const dan_na_uhradu = Math.max(0, dan_po_bonuse - celk_pred5);
-  const preplatok = Math.max(0, celk_pred5 - dan_po_bonuse);
+  const dan_na_uhradu = N(R2(Decimal.max(0, D(dan_po_bonuse).minus(celk_pred5))));
+  const preplatok = N(R2(Decimal.max(0, D(celk_pred5).minus(dan_po_bonuse))));
 
   Object.assign(C, {
     p_zivnost, p_poradca, p_dielo, p_pouzitie, p_prenajom, v_prenajom,

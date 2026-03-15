@@ -731,7 +731,7 @@
           <span class="section-title" style="font-size:12px">Daňový bonus na vyživované deti – r.33</span>
         </div>
         <div class="info-box" style="margin-top:16px">
-          Bonus 2025: dieťa <strong>do 6 rokov → 100 €/mes.</strong>, dieťa <strong>6–15 rokov → 50 €/mes.</strong>, dieťa <strong>15–18 rokov → 50 €/mes.</strong> Limitovaný na 55 % ZD z §5+§6. Deti nad 18 rokov <strong>nie je možné</strong> uplatniť.
+          Bonus 2025: dieťa <strong>do 15 rokov → 100 €/mes.</strong>, dieťa <strong>15–18 rokov → 50 €/mes.</strong> Limitovaný na <strong>29–64 %</strong> ČZD (podľa počtu detí). Pri ČZD nad 25 740 € sa bonus znižuje. Deti nad 18 rokov <strong>nie je možné</strong> uplatniť. Vek sa automaticky určí z rodného čísla.
         </div>
 
         <!-- DIEŤA 1 -->
@@ -748,10 +748,12 @@
             <div class="field">
               <label>Rodné číslo</label>
               <div style="display:flex;align-items:center;gap:6px">
-                <input type="text" id="d1_rc1" placeholder="XXXXXX" maxlength="6" style="width:100px;font-family:monospace" oninput="calcBonus()">
+                <input type="text" id="d1_rc1" placeholder="XXXXXX" maxlength="6" style="width:100px;font-family:monospace" oninput="validateChildBonus(1)">
                 <span style="font-weight:700;color:var(--muted)">/</span>
-                <input type="text" id="d1_rc2" placeholder="XXXX" maxlength="4" style="width:70px;font-family:monospace" oninput="calcBonus()">
+                <input type="text" id="d1_rc2" placeholder="XXXX" maxlength="4" style="width:70px;font-family:monospace" oninput="validateChildBonus(1)">
               </div>
+              <span id="d1_rc_err" style="display:none;color:#c0392b;font-size:11px;margin-top:2px"></span>
+              <span id="d1_rc_info" style="display:none;color:#27ae60;font-size:11px;margin-top:2px"></span>
             </div>
           </div>
           <div class="field" style="margin-bottom:12px">
@@ -805,10 +807,12 @@
             <div class="field">
               <label>Rodné číslo</label>
               <div style="display:flex;align-items:center;gap:6px">
-                <input type="text" id="d2_rc1" placeholder="XXXXXX" maxlength="6" style="width:100px;font-family:monospace" oninput="calcBonus()">
+                <input type="text" id="d2_rc1" placeholder="XXXXXX" maxlength="6" style="width:100px;font-family:monospace" oninput="validateChildBonus(2)">
                 <span style="font-weight:700;color:var(--muted)">/</span>
-                <input type="text" id="d2_rc2" placeholder="XXXX" maxlength="4" style="width:70px;font-family:monospace" oninput="calcBonus()">
+                <input type="text" id="d2_rc2" placeholder="XXXX" maxlength="4" style="width:70px;font-family:monospace" oninput="validateChildBonus(2)">
               </div>
+              <span id="d2_rc_err" style="display:none;color:#c0392b;font-size:11px;margin-top:2px"></span>
+              <span id="d2_rc_info" style="display:none;color:#27ae60;font-size:11px;margin-top:2px"></span>
             </div>
           </div>
           <div class="field" style="margin-bottom:12px">
@@ -848,7 +852,8 @@
           </div>
         </div>
 
-        <div class="warn-box">⚠️ Od roku 2025: daňový bonus na deti staršie ako 18 rokov <strong>nie je možné</strong> uplatniť. Bonus je limitovaný na 55 % ZD z §5+§6.</div>
+        <div class="warn-box">⚠️ Od roku 2025: daňový bonus na deti staršie ako 18 rokov <strong>nie je možné</strong> uplatniť. Bonus je limitovaný na 29–64 % ČZD podľa počtu detí (§33 ods. 6).</div>
+        <div id="bonus_warning" class="warn-box" style="display:none"></div>
         <div id="vysledok_odpcty" style="margin-top:16px"></div>
       </div>
     </div>
@@ -1119,12 +1124,15 @@ let C = {};
 function toggleAllMonths(d, cb) {
   for(let m=1;m<=12;m++) {
     const el = document.getElementById(`d${d}_m${m}`);
-    if(el) el.checked = cb.checked;
+    if(el && !el.disabled) el.checked = cb.checked;
   }
   calcBonus(); calc();
 }
 function syncMonthAll(d) {
-  const all = [1,2,3,4,5,6,7,8,9,10,11,12].every(m => document.getElementById(`d${d}_m${m}`)?.checked);
+  const all = [1,2,3,4,5,6,7,8,9,10,11,12].every(m => {
+    const el = document.getElementById(`d${d}_m${m}`);
+    return el?.disabled || el?.checked;
+  });
   const cb = document.getElementById(`d${d}_m0`);
   if(cb) cb.checked = all;
   calcBonus(); calc();
@@ -1134,26 +1142,342 @@ function getChildMonths(d) {
   for(let m=1;m<=12;m++) if(document.getElementById(`d${d}_m${m}`)?.checked) cnt++;
   return cnt;
 }
+// Stav validácie detí – naplní validateChildBonus()
+const childState = { 1: { valid: false, blocked: false, birthDate: null, monthRate: {} }, 2: { valid: false, blocked: false, birthDate: null, monthRate: {} } };
+
+function parseChildRC(d) {
+  // Vráti { valid, year, month, day, birthDate } alebo { valid: false }
+  const rc1 = (document.getElementById(`d${d}_rc1`)?.value || '').trim();
+  const rc2 = (document.getElementById(`d${d}_rc2`)?.value || '').trim();
+  if(!rc1 || !rc2) return { valid: false };
+  const raw = rc1 + rc2;
+  const m = raw.match(/^(\d{6})(\d{3,4})$/);
+  if(!m) return { valid: false };
+  const [, datePart, seqPart] = m;
+  const is10digit = seqPart.length === 4;
+  // Mod 11
+  if(is10digit) {
+    const full = parseInt(datePart + seqPart, 10);
+    const withoutLast = parseInt(datePart + seqPart.slice(0,3), 10);
+    const lastDigit = parseInt(seqPart[3], 10);
+    if(full % 11 !== 0 && !(withoutLast % 11 === 10 && lastDigit === 0)) return { valid: false, reason: 'mod11' };
+  }
+  let yy = parseInt(datePart.slice(0,2), 10);
+  let mm = parseInt(datePart.slice(2,4), 10);
+  const dd = parseInt(datePart.slice(4,6), 10);
+  if(mm > 70) mm -= 70; else if(mm > 50) mm -= 50; else if(mm > 20) mm -= 20;
+  const year = is10digit ? (yy < 54 ? 2000 + yy : 1900 + yy) : 1900 + yy;
+  const testDate = new Date(year, mm - 1, dd);
+  if(testDate.getFullYear() !== year || testDate.getMonth() !== mm - 1 || testDate.getDate() !== dd) return { valid: false, reason: 'date' };
+  return { valid: true, year, month: mm, day: dd, birthDate: testDate, rc: rc1 + '/' + rc2 };
+}
+
+function getAgeAtMonth(birthYear, birthMonth, birthDay, taxYear, month) {
+  // Vek dieťaťa na začiatku daného mesiaca v zdaňovacom období
+  // month: 1-12 (január-december)
+  const age = taxYear - birthYear;
+  if(month > birthMonth) return age;
+  if(month === birthMonth && taxYear === birthYear) return 0;
+  if(month <= birthMonth) return age - 1;
+  return age;
+}
+
+function validateChildBonus(d) {
+  const errEl = document.getElementById(`d${d}_rc_err`);
+  const infoEl = document.getElementById(`d${d}_rc_info`);
+  const vekSelect = document.getElementById(`d${d}_vek`);
+  const rc1El = document.getElementById(`d${d}_rc1`);
+  const rc2El = document.getElementById(`d${d}_rc2`);
+  const TAX_YEAR = 2025;
+
+  // Reset
+  childState[d] = { valid: false, blocked: false, birthDate: null, monthRate: {} };
+  if(errEl) { errEl.style.display = 'none'; errEl.textContent = ''; }
+  if(infoEl) { infoEl.style.display = 'none'; infoEl.textContent = ''; }
+  if(vekSelect) { vekSelect.disabled = false; }
+
+  const rc1 = (rc1El?.value || '').trim();
+  const rc2 = (rc2El?.value || '').trim();
+  if(!rc1 && !rc2) { calcBonus(); return; }
+  if(rc1.length < 6 || rc2.length < 3) { calcBonus(); return; }
+
+  const parsed = parseChildRC(d);
+  if(!parsed.valid) {
+    if(errEl) {
+      errEl.textContent = parsed.reason === 'mod11' ? 'Neplatné rodné číslo (kontrola mod 11)' :
+                          parsed.reason === 'date' ? 'Neplatný dátum v rodnom čísle' :
+                          'Neplatný formát rodného čísla';
+      errEl.style.display = 'block';
+    }
+    if(rc1El) rc1El.style.borderColor = '#c0392b';
+    if(rc2El) rc2El.style.borderColor = '#c0392b';
+    childState[d].blocked = true;
+    if(vekSelect) { vekSelect.value = ''; vekSelect.disabled = true; }
+    for(let m=0;m<=12;m++) { const cb = document.getElementById(`d${d}_m${m}`); if(cb) { cb.checked = false; cb.disabled = true; } }
+    calcBonus();
+    return;
+  }
+
+  const { year: bY, month: bM, day: bD, birthDate } = parsed;
+  childState[d].valid = true;
+  childState[d].birthDate = birthDate;
+  if(rc1El) rc1El.style.borderColor = '#27ae60';
+  if(rc2El) rc2El.style.borderColor = '#27ae60';
+
+  // Vek na začiatku januára 2025 (pre test či je úplne zablokované)
+  const ageJan = getAgeAtMonth(bY, bM, bD, TAX_YEAR, 1);
+
+  // Ak dieťa má 18+ už na začiatku januára → úplne zablokuj
+  if(ageJan >= 18) {
+    childState[d].blocked = true;
+    if(errEl) {
+      errEl.textContent = `Dieťa má ${ageJan} rokov k 1.1.${TAX_YEAR} (nar. ${bD}.${bM}.${bY}) – daňový bonus nie je možné uplatniť pre deti 18+`;
+      errEl.style.display = 'block';
+    }
+    if(vekSelect) { vekSelect.value = ''; vekSelect.disabled = true; }
+    for(let m=0;m<=12;m++) { const cb = document.getElementById(`d${d}_m${m}`); if(cb) { cb.checked = false; cb.disabled = true; } }
+    calcBonus();
+    return;
+  }
+
+  // Per-mesiac: zistíme sadzbu (100/50/0) a oprávnenosť
+  let hasAnyEligible = false;
+  let mesDo15 = 0, mesOd15 = 0;
+
+  for(let m=1;m<=12;m++) {
+    const age = getAgeAtMonth(bY, bM, bD, TAX_YEAR, m);
+    const cb = document.getElementById(`d${d}_m${m}`);
+    if(age < 0 || age >= 18) {
+      // Nenarodené alebo 18+ → neoprávnené
+      childState[d].monthRate[m] = 0;
+      if(cb) { cb.checked = false; cb.disabled = true; }
+    } else if(age < 15) {
+      // Do 15 rokov → 100 €/mes (vrátane mesiaca dovŕšenia 15)
+      childState[d].monthRate[m] = 100;
+      hasAnyEligible = true;
+      if(cb) cb.disabled = false;
+      mesDo15++;
+    } else {
+      // 15-17 → 50 €/mes (vrátane mesiaca dovŕšenia 18)
+      childState[d].monthRate[m] = 50;
+      hasAnyEligible = true;
+      if(cb) cb.disabled = false;
+      mesOd15++;
+    }
+  }
+
+  // Sync "all" checkbox
+  const allCb = document.getElementById(`d${d}_m0`);
+  if(allCb) allCb.disabled = !hasAnyEligible;
+
+  if(!hasAnyEligible) {
+    childState[d].blocked = true;
+    if(errEl) {
+      errEl.textContent = `Dieťa (nar. ${bD}.${bM}.${bY}) nemá oprávnený mesiac v roku ${TAX_YEAR}`;
+      errEl.style.display = 'block';
+    }
+    if(vekSelect) { vekSelect.value = ''; vekSelect.disabled = true; }
+    calcBonus();
+    return;
+  }
+
+  // Auto-určenie vek selectu (pre spätnu kompatibilitu + XML m00)
+  // Ak má oba typy mesiacov (zmena 15r. počas roka), zobrazíme info
+  let autoVek, ageInfo;
+  if(mesDo15 > 0 && mesOd15 > 0) {
+    autoVek = 'do6'; // primárne do15
+    ageInfo = `Nar. ${bD}.${bM}.${bY}: ${mesDo15} mes. × 100 € + ${mesOd15} mes. × 50 € (dovŕšenie 15 r.)`;
+  } else if(mesDo15 > 0) {
+    autoVek = 'do6';
+    const ageEnd = TAX_YEAR - bY - (12 < bM ? 1 : 0);
+    ageInfo = `Vek: ${ageEnd < 0 ? 0 : ageEnd} r. (nar. ${bD}.${bM}.${bY}) → 100 €/mes.`;
+  } else {
+    autoVek = '15_18';
+    const ageEnd = TAX_YEAR - bY - (12 < bM ? 1 : 0);
+    ageInfo = `Vek: ${ageEnd} r. (nar. ${bD}.${bM}.${bY}) → 50 €/mes.`;
+  }
+
+  if(vekSelect) { vekSelect.value = autoVek; vekSelect.disabled = true; }
+  if(infoEl) { infoEl.textContent = ageInfo; infoEl.style.display = 'block'; }
+
+  calcBonus();
+}
+
+// Vráti per-mesiac sadzbu pre dieťa d, mesiac m (100, 50, alebo 0)
+function getChildMonthRate(d, m) {
+  if(childState[d].blocked) return 0;
+  const vek = document.getElementById(`d${d}_vek`)?.value || '';
+  if(!vek) return 0;
+  if(!document.getElementById(`d${d}_m${m}`)?.checked) return 0;
+  // Ak máme RC validáciu → použijeme per-mesiac sadzbu z childState
+  if(childState[d].valid && childState[d].monthRate) {
+    return childState[d].monthRate[m] || 0;
+  }
+  // Fallback (bez RC): použijeme vek select
+  return vek === 'do6' ? 100 : 50;
+}
+
 function calcBonusRaw() {
   let total = 0;
   for(let d=1;d<=2;d++) {
-    const vek = document.getElementById(`d${d}_vek`)?.value || '';
-    if(!vek) continue;
-    const mes = getChildMonths(d);
-    const sadzba = vek==='do6' ? 100 : 50;
-    total += sadzba * mes;
+    for(let m=1;m<=12;m++) {
+      total += getChildMonthRate(d, m);
+    }
   }
   return total;
 }
+
+// Percentuálny limit podľa počtu detí (§33 ods. 6 ZDP)
+function getPercentualnyLimit(pocetDeti) {
+  switch(pocetDeti) {
+    case 1: return 0.29;
+    case 2: return 0.36;
+    case 3: return 0.43;
+    case 4: return 0.50;
+    case 5: return 0.57;
+    default: return pocetDeti >= 6 ? 0.64 : 0;
+  }
+}
+
+// Kompletný výpočet daňového bonusu podľa §33 ZDP
+// Vstup: czd = ČZD z §5 + §6 ods. 1 a 2 (uhrnZD_aktivny)
+// Výstup: { bonus, bonusRaw, bonusLimit, nevyuzity }
+function calcBonusDetailed(czd) {
+  const HIGH_INCOME_THRESHOLD = 25740; // 18 × 1430 (priem. mes. mzda 2023)
+  const TAX_YEAR = 2025;
+
+  // Zozbieraj per-mesiac dáta pre každé dieťa
+  const childrenMonthData = [];
+  for(let d=1;d<=2;d++) {
+    const rates = [];
+    let hasAny = false;
+    for(let m=1;m<=12;m++) {
+      const r = getChildMonthRate(d, m);
+      rates.push(r);
+      if(r > 0) hasAny = true;
+    }
+    if(hasAny) childrenMonthData.push({ d, rates });
+  }
+
+  if(childrenMonthData.length === 0) return { bonus: 0, bonusRaw: 0, bonusLimit: 0, nevyuzity: 0 };
+
+  const bonusRaw = childrenMonthData.reduce((sum, ch) => sum + ch.rates.reduce((s,r)=>s+r, 0), 0);
+
+  if(czd > HIGH_INCOME_THRESHOLD) {
+    // === HIGH-INCOME ALGORITMUS (§33 ods. 11) ===
+    // Bonus na každé dieťa sa zníži o 1/10 rozdielu (ČZD - 25740), alikvotne podľa mesiacov
+    let totalBonus = 0;
+    for(const child of childrenMonthData) {
+      let mesDo15 = 0, mesOd15 = 0;
+      for(let m=0;m<12;m++) {
+        if(child.rates[m] === 100) mesDo15++;
+        else if(child.rates[m] === 50) mesOd15++;
+      }
+      if(mesDo15 === 0 && mesOd15 === 0) continue;
+      const basePom = (czd - HIGH_INCOME_THRESHOLD) / 10 / 12;
+      // Podľa Priznanie.Digital: zaokrúhliť pom len ak nie je celý rok rovnaká kategória
+      const pom = (mesDo15 === 12 || mesOd15 === 12) ? basePom : Math.round(basePom * 100) / 100;
+      const znizenieDo15 = Math.round(pom * mesDo15 * 100) / 100;
+      const znizenieOd15 = Math.round(pom * mesOd15 * 100) / 100;
+      const sumaDo15 = mesDo15 * 100;
+      const sumaOd15 = mesOd15 * 50;
+      const vysledokDo15 = Math.max(0, sumaDo15 - znizenieDo15);
+      const vysledokOd15 = Math.max(0, sumaOd15 - znizenieOd15);
+      totalBonus += Math.round((vysledokDo15 + vysledokOd15) * 100) / 100;
+    }
+    return { bonus: Math.round(totalBonus * 100) / 100, bonusRaw, bonusLimit: totalBonus, nevyuzity: Math.max(0, bonusRaw - totalBonus) };
+  }
+
+  // === ŠTANDARDNÝ ALGORITMUS – percentuálny limit podľa počtu detí (§33 ods. 6) ===
+  // Zoskupíme mesiace podľa počtu oprávnených detí v danom mesiaci
+  const months = [];
+  for(let m=0;m<12;m++) {
+    let count = 0;
+    let rateSum = 0;
+    for(const child of childrenMonthData) {
+      if(child.rates[m] > 0) {
+        count++;
+        rateSum += child.rates[m];
+      }
+    }
+    months.push({ month: m+1, count, rateSum });
+  }
+
+  // Unikátne skupiny podľa počtu detí
+  const countSet = [...new Set(months.map(m => m.count))].sort((a,b) => a-b);
+  let totalBonus = 0;
+  let nevyuzity = 0;
+
+  for(const cnt of countSet) {
+    if(cnt === 0) continue;
+    const group = months.filter(m => m.count === cnt);
+    const pocetMes = group.length;
+    const partialSum = group.reduce((s,m) => s + m.rateSum, 0);
+
+    const percentLimit = getPercentualnyLimit(cnt);
+    let limit = Math.round(czd * percentLimit * 100) / 100;
+    if(pocetMes !== 12) {
+      const pom = Math.round(limit / 12 * 100) / 100;
+      limit = Math.round(pom * pocetMes * 100) / 100;
+    }
+
+    if(partialSum > limit) {
+      totalBonus += limit;
+      nevyuzity += partialSum - limit;
+    } else {
+      totalBonus += partialSum;
+    }
+  }
+
+  return { bonus: Math.round(totalBonus * 100) / 100, bonusRaw, bonusLimit: totalBonus, nevyuzity };
+}
+
 function calcBonus() {
   for(let d=1;d<=2;d++) {
-    const vek = document.getElementById(`d${d}_vek`)?.value || '';
-    const mes = getChildMonths(d);
-    const sadzba = vek==='do6' ? 100 : vek ? 50 : 0;
     const val = document.getElementById(`d${d}_bonus_val`);
-    if(val) val.textContent = fmt(sadzba * mes);
+    if(childState[d].blocked) {
+      if(val) val.textContent = '0,00 €';
+      continue;
+    }
+    let childSum = 0;
+    for(let m=1;m<=12;m++) {
+      childSum += getChildMonthRate(d, m);
+    }
+    if(val) val.textContent = fmt(childSum);
   }
   calc();
+}
+
+// Zobrazí varovania k bonusu (nulový príjem, limitovaný bonus)
+function showBonusWarnings(czd, bonusResult) {
+  const el = document.getElementById('bonus_warning');
+  if(!el) return;
+
+  const msgs = [];
+  const bonusRaw = bonusResult.bonusRaw;
+  const bonus = bonusResult.bonus;
+
+  // Kontrola: žiadny aktívny príjem
+  if(bonusRaw > 0 && czd <= 0) {
+    msgs.push('⚠️ <strong>Nulový aktívny príjem</strong> – daňový bonus si môžete uplatniť len ak máte príjem podľa §5 alebo §6 ods. 1 a 2 (ČZD > 0).');
+  }
+
+  // Kontrola: bonus bol limitovaný/znížený
+  if(bonusRaw > 0 && bonus < bonusRaw && czd > 0) {
+    const nevyuzity = Math.round((bonusRaw - bonus) * 100) / 100;
+    if(czd > 25740) {
+      msgs.push(`ℹ️ Bonus znížený z ${fmt(bonusRaw)} na <strong>${fmt(bonus)}</strong> (zníženie o ${fmt(nevyuzity)} – vysoký príjem, §33 ods. 11).`);
+    } else {
+      msgs.push(`ℹ️ Bonus znížený z ${fmt(bonusRaw)} na <strong>${fmt(bonus)}</strong> (nevyužitý bonus: ${fmt(nevyuzity)} – percentuálny limit podľa počtu detí, §33 ods. 6).`);
+    }
+  }
+
+  if(msgs.length > 0) {
+    el.innerHTML = msgs.join('<br>');
+    el.style.display = 'block';
+  } else {
+    el.style.display = 'none';
+  }
 }
 
 // ——— §5 CALC ———
@@ -1296,9 +1620,13 @@ function calc() {
   const sadzba_b = celk_prijmy_12 <= 100000 ? '15%' : '19%/25%';
   C.sadzba_b = sadzba_b; C.dan_a = dan_a; C.dan_b = dan_b; C.zd_a = zd_a; C.zd_b = zd_b;
 
-  const bonus_limit = N(R2(D(uhrnZD_aktivny).times('0.55')));
-  const bonus_raw = calcBonusRaw();
-  const bonus = N(Decimal.min(bonus_raw, bonus_limit));
+  // Daňový bonus – kompletný výpočet podľa §33 ZDP
+  // ČZD pre bonus = ČZD §5 + ČZD §6 ods.1+2 (nie §6 ods.3+4)
+  const bonusResult = calcBonusDetailed(uhrnZD_aktivny);
+  const bonus_raw = bonusResult.bonusRaw;
+  const bonus_limit = bonusResult.bonusLimit;
+  const bonus = bonusResult.bonus;
+  showBonusWarnings(uhrnZD_aktivny, bonusResult);
   let dan_po_bonuse = N(Decimal.max(0, D(dan).minus(bonus)));
 
   const celk_pred5 = C.celk_pred5 || 0;
@@ -1351,7 +1679,7 @@ function calc() {
     <div class="computed-row"><span class="computed-label">Daň §4a (r.81)</span><span class="computed-value">${fmt(dan_a)}</span></div>
     <div class="computed-row"><span class="computed-label">Daň §4b (r.96)</span><span class="computed-value">${fmt(dan_b)}</span></div>
     <div class="computed-row"><span class="computed-label">Daň spolu (r.105)</span><span class="computed-value">${fmt(dan)}</span></div>
-    <div class="computed-row"><span class="computed-label">Daňový bonus na deti</span><span class="computed-value">${fmt(bonus)}</span></div>
+    <div class="computed-row"><span class="computed-label">Daňový bonus na deti (r.117)</span><span class="computed-value">${fmt(bonus)}${bonus_raw > bonus ? ' <small style="color:#c0392b">(z '+fmt(bonus_raw)+')</small>' : ''}</span></div>
     <div class="computed-row"><span class="computed-label">Daň po bonuse</span><span class="computed-value">${fmt(dan_po_bonuse)}</span></div>
     <div class="computed-row"><span class="computed-label">Zrazené preddavky §5</span><span class="computed-value">${fmt(celk_pred5)}</span></div>
     <div class="computed-row"><span class="computed-label">DAŇ NA ÚHRADU / PREPLATOK</span><span class="computed-value highlight">${dan_na_uhradu > 0 ? fmt(dan_na_uhradu)+' (na úhradu)' : fmt(preplatok)+' (preplatok)'}</span></div>
@@ -1526,6 +1854,41 @@ function generateXMLPreview() {
     .replace(/"([^"]*)"/g,'"<span style="color:#3ecf8e">$1</span>"');
 }
 
+function buildChildXml() {
+  const esc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  let xml = '';
+  for(let d=1;d<=2;d++) {
+    const meno = (document.getElementById(`d${d}_meno`)?.value || '').trim();
+    const rc1 = (document.getElementById(`d${d}_rc1`)?.value || '').trim();
+    const rc2 = (document.getElementById(`d${d}_rc2`)?.value || '').trim();
+    const vek = document.getElementById(`d${d}_vek`)?.value || '';
+    if(!meno && !rc1) continue; // skip empty child
+    if(childState[d].blocked) continue; // skip blocked child
+    const rc = rc1 && rc2 ? rc1 + rc2 : '';
+    // Mesačné checkboxy
+    let monthsArr = [];
+    let anyMonth = false;
+    for(let m=1;m<=12;m++) {
+      const checked = document.getElementById(`d${d}_m${m}`)?.checked && (!childState[d].valid || (childState[d].monthRate[m] || 0) > 0);
+      monthsArr.push(checked ? 1 : 0);
+      if(checked) anyMonth = true;
+    }
+    if(!anyMonth && !meno) continue;
+    // m00 = sadzba: 1=100€(do15), 2=50€(15-18)
+    const m00 = vek === 'do6' ? 1 : (vek === '6_15' || vek === '15_18') ? 2 : 0; // 1=do15, 2=15-18
+    xml += `\t\t<dieta>\n`;
+    xml += `\t\t\t<priezviskoMeno>${esc(meno)}</priezviskoMeno>\n`;
+    xml += `\t\t\t<rodneCislo>${esc(rc)}</rodneCislo>\n`;
+    xml += `\t\t\t<m00>${m00}</m00>\n`;
+    xml += `\t\t\t`;
+    for(let m=1;m<=12;m++) {
+      xml += `<m${String(m).padStart(2,'0')}>${monthsArr[m-1]}</m${String(m).padStart(2,'0')}>`;
+    }
+    xml += `\n\t\t</dieta>\n`;
+  }
+  return xml;
+}
+
 function buildXML() {
   const esc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   const n2 = n => (n && n !== 0) ? Number(n).toFixed(2) : '';
@@ -1661,17 +2024,10 @@ function buildXML() {
 \t<pocetMesiacov></pocetMesiacov>
 \t</r32>
 \t<r33>
-\t\t<dieta>
-\t\t\t<priezviskoMeno></priezviskoMeno>
-\t\t\t<rodneCislo></rodneCislo>
-\t\t\t<m00>0</m00>
-\t\t\t<m01>0</m01><m02>0</m02><m03>0</m03><m04>0</m04><m05>0</m05>
-\t\t\t<m06>0</m06><m07>0</m07><m08>0</m08><m09>0</m09><m10>0</m10>
-\t\t\t<m11>0</m11><m12>0</m12>
-\t\t</dieta>
+${buildChildXml()}
 \t</r33>
-\t<r33a>0</r33a>
-\t<uplatnujemPar33Ods8>0</uplatnujemPar33Ods8>
+\t<r33a>${n2z(C.bonus)}</r33a>
+\t<uplatnujemPar33Ods8>${C.bonus > 0 ? 1 : 0}</uplatnujemPar33Ods8>
 \t<r34>
 \t\t<priezviskoMeno></priezviskoMeno>
 \t\t<rodneCislo></rodneCislo>
@@ -1915,6 +2271,21 @@ function buildXML() {
 function generateXML() {
   try {
     calc5(); calc();
+    // Validácia daňového bonusu – zablokuj ak neplatné dieťa
+    for(let d=1;d<=2;d++) {
+      const meno = (document.getElementById(`d${d}_meno`)?.value || '').trim();
+      const rc1 = (document.getElementById(`d${d}_rc1`)?.value || '').trim();
+      if(meno || rc1) {
+        if(childState[d].blocked) {
+          alert(`Dieťa ${d}: Neplatné rodné číslo alebo dieťa má 18+ rokov.\nOpravte údaje alebo vymažte dieťa pred generovaním XML.`);
+          return;
+        }
+        if(!childState[d].valid && rc1) {
+          alert(`Dieťa ${d}: Rodné číslo nie je platné. Skontrolujte údaje.`);
+          return;
+        }
+      }
+    }
     const xml = buildXML();
     const filename = `DPFOBv25_${document.getElementById('priezvisko').value||'dankovnik'}_2025.xml`;
     // Metóda 1: Blob + objektURL

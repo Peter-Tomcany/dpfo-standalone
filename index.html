@@ -131,6 +131,7 @@
   /* ── INFO BOXES ── */
   .info-box{padding:13px 16px;background:rgba(175,250,150,.15);border:1.5px solid rgba(175,250,150,.5);border-radius:8px;font-size:12px;color:var(--purple);line-height:1.6;margin-bottom:16px;font-weight:500}
   .ngo-autocomplete-wrap{position:relative}
+  .ngo-autocomplete-wrap input{padding-left:32px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%239b8fb0' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85zm-5.242.656a5 5 0 1 1 0-10 5 5 0 0 1 0 10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:8px center;background-size:16px}
   .ngo-autocomplete-list{position:absolute;top:100%;left:0;right:0;max-height:220px;overflow-y:auto;background:#fff;border:1.5px solid var(--border);border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.12);z-index:100;margin-top:2px;display:none}
   .ngo-autocomplete-list.open{display:block}
   .ngo-autocomplete-item{padding:8px 12px;cursor:pointer;font-size:13px;border-bottom:1px solid #f0f0f0;display:flex;justify-content:space-between;align-items:center}
@@ -1048,9 +1049,9 @@
             </select>
           </div>
           <div class="field">
-            <label>Vyhľadať prijímateľa <span style="font-weight:400;color:var(--muted)">(názov alebo IČO)</span></label>
+            <label>Obchodné meno prijímateľa <span style="font-weight:400;color:var(--green);text-decoration:underline">(začnite písať pre vyhľadanie)</span></label>
             <div class="ngo-autocomplete-wrap">
-              <input type="text" id="ngoSearch" placeholder="Začnite písať názov alebo IČO organizácie…" autocomplete="off">
+              <input type="text" id="asig_nazov" placeholder="Začnite písať názov alebo IČO organizácie…" autocomplete="off" oninput="calcAsig()">
               <div id="ngoAutocompleteList" class="ngo-autocomplete-list"></div>
             </div>
           </div>
@@ -1061,13 +1062,6 @@
             <input type="text" id="asig_ico" placeholder="napr. 12345678" maxlength="12" oninput="calcAsig()">
           </div>
           <div class="field">
-            <label>Obchodné meno prijímateľa</label>
-            <input type="text" id="asig_nazov" placeholder="napr. Nadácia XY" oninput="calcAsig()">
-          </div>
-        </div>
-        <p id="ngoSelectedInfo" style="font-size:12px;color:var(--muted);margin-top:-8px;margin-bottom:12px;display:none"></p>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
-          <div class="field">
             <label>Súhlas so zaslaním údajov prijímateľovi</label>
             <select id="asig_suhlas">
               <option value="0">Nesúhlasím</option>
@@ -1075,6 +1069,7 @@
             </select>
           </div>
         </div>
+        <p id="ngoSelectedInfo" style="font-size:12px;color:var(--muted);margin-top:-4px;margin-bottom:12px;display:none"></p>
         <div id="asig_vysledok" style="margin-top:8px;"></div>
 
         <div id="asig_neuplatnujem_box" style="margin-top:12px;padding:10px 14px;background:#f0faf0;border:1px solid #b8dfc8;border-radius:8px;display:flex;align-items:center;gap:10px;">
@@ -3016,17 +3011,15 @@ function searchNgo(query, limit) {
   return exact.concat(partial).slice(0, limit);
 }
 (function initNgoAutocomplete() {
-  var searchInp = document.getElementById('ngoSearch');
+  var menoInp = document.getElementById('asig_nazov');
   var listEl = document.getElementById('ngoAutocompleteList');
   var infoEl = document.getElementById('ngoSelectedInfo');
   var icoInp = document.getElementById('asig_ico');
-  var menoInp = document.getElementById('asig_nazov');
-  if (!searchInp || !listEl) return;
+  if (!menoInp || !listEl) return;
   var esc = function(s) { var d = document.createElement('div'); d.textContent = s; return d.innerHTML; };
   function selectNgo(ngo) {
     icoInp.value = ngo.ico;
     menoInp.value = ngo.nazov;
-    searchInp.value = '';
     listEl.classList.remove('open');
     infoEl.textContent = ngo.nazov + ', ' + ngo.obec + ' (IČO: ' + ngo.ico + ')';
     infoEl.style.display = 'block';
@@ -3051,14 +3044,16 @@ function searchNgo(query, limit) {
     });
   }
   var searchTimeout = null;
-  searchInp.addEventListener('focus', function() { loadNgoData(); });
-  searchInp.addEventListener('input', function() {
+  menoInp.addEventListener('focus', function() { loadNgoData(); });
+  menoInp.addEventListener('input', function() {
     var val = this.value.trim();
     clearTimeout(searchTimeout);
     if (val.length < 2) { listEl.classList.remove('open'); return; }
-    searchTimeout = setTimeout(function() { renderNgoResults(searchNgo(val)); }, 150);
+    searchTimeout = setTimeout(function() {
+      loadNgoData().then(function() { renderNgoResults(searchNgo(val)); });
+    }, 150);
   });
-  searchInp.addEventListener('blur', function() { setTimeout(function() { listEl.classList.remove('open'); }, 200); });
+  menoInp.addEventListener('blur', function() { setTimeout(function() { listEl.classList.remove('open'); }, 200); });
 })();
 
 // Init

@@ -130,6 +130,15 @@
 
   /* ── INFO BOXES ── */
   .info-box{padding:13px 16px;background:rgba(175,250,150,.15);border:1.5px solid rgba(175,250,150,.5);border-radius:8px;font-size:12px;color:var(--purple);line-height:1.6;margin-bottom:16px;font-weight:500}
+  .ngo-autocomplete-wrap{position:relative}
+  .ngo-autocomplete-list{position:absolute;top:100%;left:0;right:0;max-height:220px;overflow-y:auto;background:#fff;border:1.5px solid var(--border);border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.12);z-index:100;margin-top:2px;display:none}
+  .ngo-autocomplete-list.open{display:block}
+  .ngo-autocomplete-item{padding:8px 12px;cursor:pointer;font-size:13px;border-bottom:1px solid #f0f0f0;display:flex;justify-content:space-between;align-items:center}
+  .ngo-autocomplete-item:last-child{border-bottom:none}
+  .ngo-autocomplete-item:hover,.ngo-autocomplete-item.active{background:var(--primary-light,#f0ecfe)}
+  .ngo-autocomplete-item .ngo-name{font-weight:500;color:var(--text)}
+  .ngo-autocomplete-item .ngo-ico{color:var(--muted);font-size:11px;white-space:nowrap;margin-left:8px}
+  .ngo-autocomplete-item .ngo-obec{color:var(--muted);font-size:11px}
   .warn-box{padding:13px 16px;background:rgba(50,25,65,.06);border:1.5px solid rgba(50,25,65,.2);border-radius:8px;font-size:12px;color:var(--purple);line-height:1.6;margin-top:12px;font-weight:500}
 
   /* ── XML OUTPUT ── */
@@ -173,7 +182,9 @@
   .month-opt:has(input:checked){background:var(--purple);color:var(--green);border-color:var(--purple)}
 
   /* ── AUTH / CLIENT OVERLAYS ── */
-
+  .overlay{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;background:var(--bg)}
+  .overlay.hidden{display:none}
+  .auth-card{background:var(--surface);border:1.5px solid var(--border);border-radius:16px;padding:44px 40px;width:400px;max-width:92vw;box-shadow:0 8px 32px rgba(50,25,65,.12)}
   .auth-logo{display:flex;align-items:center;gap:12px;margin-bottom:32px}
   .auth-title{font-size:22px;font-weight:800;color:var(--purple);margin-bottom:6px;letter-spacing:-.02em}
   .auth-sub{font-size:13px;color:var(--muted);margin-bottom:28px}
@@ -185,28 +196,44 @@
   .auth-err.show{display:block}
 
   /* ── CLIENT MANAGER ── */
-
+  .cm-overlay{position:fixed;inset:0;z-index:150;background:var(--bg);overflow-y:auto}
+  .cm-overlay.hidden{display:none}
+  .cm-wrap{max-width:860px;margin:0 auto;padding:40px 24px 80px}
   .cm-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;gap:16px}
   .cm-title{font-size:24px;font-weight:800;color:var(--purple);letter-spacing:-.02em}
   .cm-search{background:var(--surface);border:1.5px solid var(--border);border-radius:8px;padding:10px 14px;font-family:var(--sans);font-size:13px;width:260px;color:var(--text)}
   .cm-search:focus{outline:none;border-color:var(--purple)}
-
+  .cm-list{display:flex;flex-direction:column;gap:10px;margin-top:20px}
+  .cm-item{background:var(--surface);border:1.5px solid var(--border);border-radius:12px;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;transition:all .15s}
+  .cm-item:hover{border-color:var(--purple);box-shadow:0 4px 12px rgba(50,25,65,.1)}
+  .cm-item-info{flex:1}
+  .cm-item-name{font-size:15px;font-weight:700;color:var(--purple)}
+  .cm-item-meta{font-size:12px;color:var(--muted);margin-top:2px}
+  .cm-item-actions{display:flex;gap:8px}
   .cm-btn-select{background:var(--purple);color:#fff;border:none;padding:8px 18px;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--sans)}
   .cm-btn-select:hover{background:var(--purple2)}
+  .cm-btn-edit{background:transparent;border:1.5px solid rgba(50,25,65,.25);color:var(--purple);padding:7px 12px;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--sans)}
+  .cm-btn-edit:hover{background:rgba(50,25,65,.06)}
   .cm-btn-del{background:transparent;border:1.5px solid rgba(192,57,43,.3);color:#c0392b;padding:7px 12px;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--sans)}
   .cm-btn-del:hover{background:rgba(192,57,43,.08)}
   .cm-empty{text-align:center;padding:60px 20px;color:var(--muted);font-size:14px}
 
   /* ── ADD CLIENT FORM ── */
-
+  .cm-add-panel{background:var(--surface);border:1.5px solid var(--border);border-radius:12px;padding:24px;margin-bottom:24px;display:none}
+  .cm-add-panel.open{display:block}
+  .cm-add-title{font-size:14px;font-weight:700;color:var(--purple);margin-bottom:16px;text-transform:uppercase;letter-spacing:.04em}
 
   /* ── HEADER USER BADGE ── */
-
+  .user-badge{display:flex;align-items:center;gap:10px}
   .user-name{font-size:12px;color:rgba(175,250,150,.7);font-weight:500}
-
+  .btn-clients{background:rgba(175,250,150,.15);border:1px solid rgba(175,250,150,.3);color:var(--green);padding:7px 16px;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--sans);transition:all .15s}
+  .btn-clients:hover{background:rgba(175,250,150,.25)}
+  .btn-logout{background:transparent;border:1px solid rgba(175,250,150,.2);color:rgba(175,250,150,.5);padding:7px 12px;border-radius:7px;font-size:11px;font-weight:600;cursor:pointer;font-family:var(--sans)}
+  .btn-logout:hover{border-color:rgba(175,250,150,.5);color:var(--green)}
 
   /* ── SAVE INDICATOR ── */
-
+  .save-indicator{position:fixed;bottom:20px;right:20px;background:var(--purple);color:var(--green);padding:10px 18px;border-radius:9px;font-size:12px;font-weight:700;box-shadow:0 4px 16px rgba(50,25,65,.25);z-index:300;opacity:0;transition:opacity .3s;pointer-events:none}
+  .save-indicator.show{opacity:1}
 
   /* ── PAGE TITLE AREA ── */
   .page-hero{
@@ -233,7 +260,6 @@
 </style>
 </head>
 <body>
-<!-- ── LOGIN OVERLAY ── -->
 
 <header>
   <div class="logo-wrap">
@@ -242,6 +268,7 @@
     <div class="logo-label">DPFO Typ B</div>
   </div>
   <div class="badge">ZO 2025</div>
+  </div>
 </header>
 
 <div class="container">
@@ -559,6 +586,7 @@
 
         <!-- ODVODY – permanently visible (no accordion) -->
         <div style="margin-top:6px"></div>
+
         <div class="sub-header section-header" style="background:rgba(62,207,142,.06)">
           <span class="section-tag" style="background:rgba(62,207,142,.15)">ODVODY SČZO</span>
           <span class="section-title" style="font-size:12px">Zaplatené poistné pod Tab.1 / Príloha č.4</span>
@@ -854,9 +882,145 @@
 
         <div class="warn-box">⚠️ Od roku 2025: daňový bonus na deti staršie ako 18 rokov <strong>nie je možné</strong> uplatniť. Bonus je limitovaný na 29–64 % ČZD podľa počtu detí (§33 ods. 6).</div>
         <div id="bonus_warning" class="warn-box" style="display:none"></div>
-        <div id="vysledok_odpcty" style="margin-top:16px"></div>
       </div>
     </div>
+
+    <!-- r.34 – DRUHÁ OPRÁVNENÁ OSOBA (§33 ods. 8) -->
+    <div class="section" id="section_r34">
+      <div class="section-header">
+        <span class="section-tag">§33 ods.8</span>
+        <span class="section-title">Uplatnenie základu dane druhej oprávnenej osoby – r.34</span>
+      </div>
+      <div class="section-body">
+        <div class="info-box">
+          Ak daňový bonus na deti prevyšuje vašu daň, môžete si navýšiť základ dane o príjem <strong>druhej oprávnenej osoby</strong> (napr. manžel/ka, druhý rodič). Tým sa zvýši limit pre daňový bonus.
+        </div>
+        <div style="margin-bottom:12px;padding:10px 14px;background:#f7f6f9;border:1px solid #d4c8e8;border-radius:8px;display:flex;align-items:center;gap:10px;">
+          <input type="checkbox" id="r34_enabled" style="width:16px;height:16px;accent-color:#321941;" onchange="toggleR34()">
+          <label for="r34_enabled" style="font-size:13px;color:#321941;margin:0;cursor:pointer;">Uplatňujem základ dane <strong>druhej oprávnenej osoby</strong> (§33 ods. 8)</label>
+        </div>
+        <div id="r34_fields" style="display:none">
+          <div class="grid grid-2" style="margin-bottom:12px">
+            <div class="field">
+              <label>Priezvisko a meno druhej oprávnenej osoby</label>
+              <input type="text" id="r34_meno" placeholder="napr. Nováková Jana" oninput="calc()">
+            </div>
+            <div class="field">
+              <label>Rodné číslo</label>
+              <div style="display:flex;align-items:center;gap:6px">
+                <input type="text" id="r34_rc1" placeholder="XXXXXX" maxlength="6" style="width:100px;font-family:monospace">
+                <span style="font-weight:700;color:var(--muted)">/</span>
+                <input type="text" id="r34_rc2" placeholder="XXXX" maxlength="4" style="width:70px;font-family:monospace">
+              </div>
+            </div>
+          </div>
+          <div class="grid grid-2" style="margin-bottom:12px">
+            <div class="field">
+              <label>Mesiace uplatnenia (od)</label>
+              <select id="r34_mesiac_od" onchange="calc()">
+                <option value="1">Január (1)</option>
+                <option value="2">Február (2)</option>
+                <option value="3">Marec (3)</option>
+                <option value="4">Apríl (4)</option>
+                <option value="5">Máj (5)</option>
+                <option value="6">Jún (6)</option>
+                <option value="7">Júl (7)</option>
+                <option value="8">August (8)</option>
+                <option value="9">September (9)</option>
+                <option value="10">Október (10)</option>
+                <option value="11">November (11)</option>
+                <option value="12">December (12)</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Mesiace uplatnenia (do)</label>
+              <select id="r34_mesiac_do" onchange="calc()">
+                <option value="1">Január (1)</option>
+                <option value="2">Február (2)</option>
+                <option value="3">Marec (3)</option>
+                <option value="4">Apríl (4)</option>
+                <option value="5">Máj (5)</option>
+                <option value="6">Jún (6)</option>
+                <option value="7">Júl (7)</option>
+                <option value="8">August (8)</option>
+                <option value="9">September (9)</option>
+                <option value="10">Október (10)</option>
+                <option value="11">November (11)</option>
+                <option value="12" selected>December (12)</option>
+              </select>
+            </div>
+          </div>
+          <div class="grid grid-2" style="margin-bottom:12px">
+            <div class="field">
+              <label>Spôsob vysporiadania príjmov druhej osoby</label>
+              <select id="r34_typ_prijmu" onchange="calc()">
+                <option value="">— vyberte —</option>
+                <option value="dpA">DPFO typ A</option>
+                <option value="dpB">DPFO typ B</option>
+                <option value="rocneZuct">Ročné zúčtovanie preddavkov</option>
+                <option value="bezDP">Bez povinnosti podať DP / bez zúčtovania</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Vlastné príjmy druhej osoby (€) – r.34a</label>
+              <input type="number" id="r34a_prijem" value="0" min="0" step="0.01" oninput="calc()">
+              <span id="r34a_hint" class="field-note">Príjem z DP alebo ročného zúčtovania</span>
+            </div>
+          </div>
+          <div id="r34_vysledok" style="margin-top:8px"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- r.35 – DAŇOVÝ BONUS NA ZAPLATENÉ ÚROKY -->
+    <div class="section" id="section_r35">
+      <div class="section-header">
+        <span class="section-tag">§33a</span>
+        <span class="section-title">Daňový bonus na zaplatené úroky – r.35</span>
+      </div>
+      <div class="section-body">
+        <div class="info-box">
+          Bonus = <strong>50 % zaplatených úrokov</strong>, max <strong>400 €/rok</strong> (zmluvy pred 2024) alebo <strong>1 200 €/rok</strong> (zmluvy od 2024). Platí <strong>5 rokov</strong> od začiatku úročenia. Podmienky: vek 18–35 rokov pri podpise, príjmový limit.
+        </div>
+        <div style="margin-bottom:12px;padding:10px 14px;background:#f0f0fa;border:1px solid #c8c8e8;border-radius:8px;display:flex;align-items:center;gap:10px;">
+          <input type="checkbox" id="r35_enabled" style="width:16px;height:16px;accent-color:#321941;" onchange="toggleR35()">
+          <label for="r35_enabled" style="font-size:13px;color:#3a3a6a;margin:0;cursor:pointer;">Uplatňujem <strong>daňový bonus na zaplatené úroky</strong> (§33a)</label>
+        </div>
+        <div id="r35_fields" style="display:none">
+          <div class="grid grid-2" style="margin-bottom:12px">
+            <div class="field">
+              <label>Dátum uzavretia zmluvy o úvere</label>
+              <input type="date" id="r35_datum_zmluvy" oninput="calcUroky()">
+            </div>
+            <div class="field">
+              <label>Dátum začatia úročenia úveru</label>
+              <input type="date" id="r35_datum_urocenia" oninput="calcUroky()">
+            </div>
+          </div>
+          <div class="grid grid-2" style="margin-bottom:12px">
+            <div class="field">
+              <label>Zaplatené úroky v roku 2025 (€)</label>
+              <input type="number" id="r35_uroky" value="0" min="0" step="0.01" oninput="calcUroky()">
+              <span class="field-note">Podľa potvrdenia z banky</span>
+            </div>
+            <div class="field">
+              <label>Počet mesiacov úročenia v roku 2025</label>
+              <input type="number" id="r35_pocet_mesiacov" value="12" min="1" max="12" step="1" oninput="calcUroky()">
+              <span class="field-note" id="r35_mesiac_hint">Automaticky vypočítané z dátumu začiatku úročenia</span>
+            </div>
+          </div>
+          <div id="r35_vysledok" style="margin-top:8px"></div>
+          <div id="r35_warning" class="warn-box" style="display:none"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-body">
+        <div id="vysledok_odpcty" style="margin-top:0"></div>
+      </div>
+    </div>
+
     <div class="btn-row">
       <button class="btn btn-secondary" onclick="goPage(2)">← Späť</button>
       <button class="btn btn-primary" onclick="goPage(4);buildSummary()">Zobraziť súhrn →</button>
@@ -884,15 +1048,25 @@
             </select>
           </div>
           <div class="field">
-            <label>IČO prijímateľa</label>
-            <input type="text" id="asig_ico" placeholder="napr. 12345678" maxlength="12" oninput="calcAsig()">
+            <label>Vyhľadať prijímateľa <span style="font-weight:400;color:var(--muted)">(názov alebo IČO)</span></label>
+            <div class="ngo-autocomplete-wrap">
+              <input type="text" id="ngoSearch" placeholder="Začnite písať názov alebo IČO organizácie…" autocomplete="off">
+              <div id="ngoAutocompleteList" class="ngo-autocomplete-list"></div>
+            </div>
           </div>
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
           <div class="field">
+            <label>IČO prijímateľa</label>
+            <input type="text" id="asig_ico" placeholder="napr. 12345678" maxlength="12" oninput="calcAsig()">
+          </div>
+          <div class="field">
             <label>Obchodné meno prijímateľa</label>
             <input type="text" id="asig_nazov" placeholder="napr. Nadácia XY" oninput="calcAsig()">
           </div>
+        </div>
+        <p id="ngoSelectedInfo" style="font-size:12px;color:var(--muted);margin-top:-8px;margin-bottom:12px;display:none"></p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
           <div class="field">
             <label>Súhlas so zaslaním údajov prijímateľovi</label>
             <select id="asig_suhlas">
@@ -916,6 +1090,35 @@
           <input type="checkbox" id="asig_neupl_50aa" checked style="width:16px;height:16px;accent-color:#321941;">
           <label for="asig_neupl_50aa" style="font-size:13px;color:#3a3a6a;margin:0;cursor:pointer;">neuplatňujem postup podľa <strong>§ 50aa zákona</strong> (r.153 – poukázanie dane rodičom)</label>
         </div>
+      </div>
+    </div>
+
+    <!-- XIV. ODDIEL – Žiadosť o vyplatenie / vrátenie -->
+    <div class="section" id="section_xiv" style="display:none">
+      <div class="section-header"><span class="section-tag">XIV. ODDIEL</span><span class="section-title">Žiadosť o vyplatenie daňového bonusu / vrátenie preplatku</span></div>
+      <div class="section-body">
+        <div class="info-box" id="xiv_info_box"></div>
+        <div id="xiv_checkboxes" style="margin-bottom:12px">
+          <div id="xiv_bonus_wrap" style="display:none;margin-bottom:8px;padding:10px 14px;background:#f7f6f9;border:1px solid #d4c8e8;border-radius:8px;align-items:center;gap:10px;">
+            <input type="checkbox" id="xiv_vyplatit_bonus" checked style="width:16px;height:16px;accent-color:#321941;" onchange="updateXIV()">
+            <label for="xiv_vyplatit_bonus" style="font-size:13px;color:#321941;margin:0;cursor:pointer;">Žiadam o <strong>vyplatenie daňového bonusu</strong> podľa §33 (r.121)</label>
+          </div>
+          <div id="xiv_preplatok_wrap" style="display:none;margin-bottom:8px;padding:10px 14px;background:#f0faf0;border:1px solid #b8dfc8;border-radius:8px;align-items:center;gap:10px;">
+            <input type="checkbox" id="xiv_vratit_preplatok" checked style="width:16px;height:16px;accent-color:#321941;" onchange="updateXIV()">
+            <label for="xiv_vratit_preplatok" style="font-size:13px;color:#2a5c3a;margin:0;cursor:pointer;">Žiadam o <strong>vrátenie daňového preplatku</strong> (r.136)</label>
+          </div>
+        </div>
+        <div class="grid grid-2" style="margin-bottom:12px">
+          <div class="field">
+            <label>IBAN (bankový účet)</label>
+            <input type="text" id="xiv_iban" placeholder="napr. SK3112000000198742637541" maxlength="34" style="font-family:monospace;letter-spacing:1px" oninput="formatIBAN(this);updateXIV()">
+          </div>
+          <div class="field">
+            <label>Dátum žiadosti</label>
+            <input type="date" id="xiv_datum" oninput="updateXIV()">
+          </div>
+        </div>
+        <div id="xiv_status" style="margin-top:8px"></div>
       </div>
     </div>
 
@@ -1023,7 +1226,6 @@ function toggleSkutocnePouzitie() {
 function validateRC(el) {
   const errEl = document.getElementById('rc_err');
   const raw = el.value.replace(/\s/g, '');
-  // Auto-formátovanie: pridaj lomku po 6 znakoch
   if(/^\d{7,}$/.test(raw) && !raw.includes('/')) {
     el.value = raw.slice(0,6) + '/' + raw.slice(6);
   }
@@ -1038,10 +1240,8 @@ function validateRC(el) {
   const [, datePart, seqPart] = m;
   const is10digit = seqPart.length === 4;
 
-  // Modulo 11 kontrola (len pre 10-miestne, t.j. narodení po 1.1.1954)
   if(is10digit) {
     const full = parseInt(datePart + seqPart, 10);
-    // Špeciálna výnimka: ak číslo bez poslednej cifry mod 11 = 10 a posledná cifra = 0
     const withoutLast = parseInt(datePart + seqPart.slice(0,3), 10);
     const lastDigit = parseInt(seqPart[3], 10);
     const mod = full % 11;
@@ -1053,33 +1253,27 @@ function validateRC(el) {
     }
   }
 
-  // Parsovanie dátumu
   let yy = parseInt(datePart.slice(0,2), 10);
   let mm = parseInt(datePart.slice(2,4), 10);
   const dd = parseInt(datePart.slice(4,6), 10);
 
-  // Ženy majú mesiac + 50, od 2004 možné +20 navyše
-  if(mm > 70) mm -= 70;       // žena + extra 20 (od 2004)
-  else if(mm > 50) mm -= 50;  // žena
-  else if(mm > 20) mm -= 20;  // muž + extra 20 (od 2004)
+  if(mm > 70) mm -= 70;
+  else if(mm > 50) mm -= 50;
+  else if(mm > 20) mm -= 20;
 
-  // Rok: 9-miestne = pred 1954, 10-miestne = 1954+
   const year = is10digit ? (yy < 54 ? 2000 + yy : 1900 + yy) : 1900 + yy;
 
-  // Kontrola platnosti dátumu
   const testDate = new Date(year, mm - 1, dd);
   if(testDate.getFullYear() !== year || testDate.getMonth() !== mm - 1 || testDate.getDate() !== dd) {
     errEl.textContent = 'Neplatný dátum narodenia v rodnom čísle';
     errEl.style.display='block'; el.style.borderColor='#c0392b'; return;
   }
 
-  // Ak dátum v budúcnosti
   if(testDate > new Date()) {
     errEl.textContent = 'Dátum narodenia je v budúcnosti';
     errEl.style.display='block'; el.style.borderColor='#e67e22'; return;
   }
 
-  // Auto-vyplnenie dátumu narodenia
   const datnarEl = document.getElementById('datnar');
   if(datnarEl && !datnarEl.value) {
     datnarEl.value = `${year}-${String(mm).padStart(2,'0')}-${String(dd).padStart(2,'0')}`;
@@ -1096,9 +1290,7 @@ function updateTab1ab() {
   wrapper.style.display = hasPrijmy6 ? 'block' : 'none';
   if(!hasPrijmy6) return;
 
-  // Ak má prenájom (§6 ods.3) → vždy 1a (paušál nie je možný pri prenájme)
   const hasPrenajom = v('p_prenajom') > 0;
-  // Ak má aspoň jednu kategóriu so skutočnými výdavkami → 1a
   const skutZivnost  = rv('vydavky_zivnost')==='skutocne'  && v('p_zivnost') > 0;
   const skutPoradca  = rv('vydavky_poradca')==='skutocne'  && v('p_poradca') > 0;
   const skutDielo    = rv('vydavky_dielo')==='skutocne'    && v('p_dielo') > 0;
@@ -1116,8 +1308,9 @@ const fmt = n => n.toFixed(2).replace('.',',')+' €';
 
 // Decimal.js helpers – presná aritmetika pre daňové výpočty
 const D = x => new Decimal(x || 0);
-const R2 = d => d.toDecimalPlaces(2, Decimal.ROUND_HALF_UP);  // zaokrúhlenie na 2 des. miesta
-const N = d => d.toNumber();  // konverzia späť na JS number
+const R2 = d => d.toDecimalPlaces(2, Decimal.ROUND_HALF_UP);
+const N = d => d.toNumber();
+
 let C = {};
 
 // ——— MONTH HELPERS ———
@@ -1146,7 +1339,6 @@ function getChildMonths(d) {
 const childState = { 1: { valid: false, blocked: false, birthDate: null, monthRate: {} }, 2: { valid: false, blocked: false, birthDate: null, monthRate: {} } };
 
 function parseChildRC(d) {
-  // Vráti { valid, year, month, day, birthDate } alebo { valid: false }
   const rc1 = (document.getElementById(`d${d}_rc1`)?.value || '').trim();
   const rc2 = (document.getElementById(`d${d}_rc2`)?.value || '').trim();
   if(!rc1 || !rc2) return { valid: false };
@@ -1155,7 +1347,6 @@ function parseChildRC(d) {
   if(!m) return { valid: false };
   const [, datePart, seqPart] = m;
   const is10digit = seqPart.length === 4;
-  // Mod 11
   if(is10digit) {
     const full = parseInt(datePart + seqPart, 10);
     const withoutLast = parseInt(datePart + seqPart.slice(0,3), 10);
@@ -1173,8 +1364,6 @@ function parseChildRC(d) {
 }
 
 function getAgeAtMonth(birthYear, birthMonth, birthDay, taxYear, month) {
-  // Vek dieťaťa na začiatku daného mesiaca v zdaňovacom období
-  // month: 1-12 (január-december)
   const age = taxYear - birthYear;
   if(month > birthMonth) return age;
   if(month === birthMonth && taxYear === birthYear) return 0;
@@ -1248,17 +1437,14 @@ function validateChildBonus(d) {
     const age = getAgeAtMonth(bY, bM, bD, TAX_YEAR, m);
     const cb = document.getElementById(`d${d}_m${m}`);
     if(age < 0 || age >= 18) {
-      // Nenarodené alebo 18+ → neoprávnené
       childState[d].monthRate[m] = 0;
       if(cb) { cb.checked = false; cb.disabled = true; }
     } else if(age < 15) {
-      // Do 15 rokov → 100 €/mes (vrátane mesiaca dovŕšenia 15)
       childState[d].monthRate[m] = 100;
       hasAnyEligible = true;
       if(cb) cb.disabled = false;
       mesDo15++;
     } else {
-      // 15-17 → 50 €/mes (vrátane mesiaca dovŕšenia 18)
       childState[d].monthRate[m] = 50;
       hasAnyEligible = true;
       if(cb) cb.disabled = false;
@@ -1266,7 +1452,6 @@ function validateChildBonus(d) {
     }
   }
 
-  // Sync "all" checkbox
   const allCb = document.getElementById(`d${d}_m0`);
   if(allCb) allCb.disabled = !hasAnyEligible;
 
@@ -1281,11 +1466,10 @@ function validateChildBonus(d) {
     return;
   }
 
-  // Auto-určenie vek selectu (pre spätnu kompatibilitu + XML m00)
-  // Ak má oba typy mesiacov (zmena 15r. počas roka), zobrazíme info
+  // Auto-určenie vek selectu
   let autoVek, ageInfo;
   if(mesDo15 > 0 && mesOd15 > 0) {
-    autoVek = 'do6'; // primárne do15
+    autoVek = 'do6';
     ageInfo = `Nar. ${bD}.${bM}.${bY}: ${mesDo15} mes. × 100 € + ${mesOd15} mes. × 50 € (dovŕšenie 15 r.)`;
   } else if(mesDo15 > 0) {
     autoVek = 'do6';
@@ -1340,13 +1524,10 @@ function getPercentualnyLimit(pocetDeti) {
 }
 
 // Kompletný výpočet daňového bonusu podľa §33 ZDP
-// Vstup: czd = ČZD z §5 + §6 ods. 1 a 2 (uhrnZD_aktivny)
-// Výstup: { bonus, bonusRaw, bonusLimit, nevyuzity }
 function calcBonusDetailed(czd) {
   const HIGH_INCOME_THRESHOLD = 25740; // 18 × 1430 (priem. mes. mzda 2023)
   const TAX_YEAR = 2025;
 
-  // Zozbieraj per-mesiac dáta pre každé dieťa
   const childrenMonthData = [];
   for(let d=1;d<=2;d++) {
     const rates = [];
@@ -1365,7 +1546,6 @@ function calcBonusDetailed(czd) {
 
   if(czd > HIGH_INCOME_THRESHOLD) {
     // === HIGH-INCOME ALGORITMUS (§33 ods. 11) ===
-    // Bonus na každé dieťa sa zníži o 1/10 rozdielu (ČZD - 25740), alikvotne podľa mesiacov
     let totalBonus = 0;
     for(const child of childrenMonthData) {
       let mesDo15 = 0, mesOd15 = 0;
@@ -1375,7 +1555,6 @@ function calcBonusDetailed(czd) {
       }
       if(mesDo15 === 0 && mesOd15 === 0) continue;
       const basePom = (czd - HIGH_INCOME_THRESHOLD) / 10 / 12;
-      // Podľa Priznanie.Digital: zaokrúhliť pom len ak nie je celý rok rovnaká kategória
       const pom = (mesDo15 === 12 || mesOd15 === 12) ? basePom : Math.round(basePom * 100) / 100;
       const znizenieDo15 = Math.round(pom * mesDo15 * 100) / 100;
       const znizenieOd15 = Math.round(pom * mesOd15 * 100) / 100;
@@ -1389,7 +1568,6 @@ function calcBonusDetailed(czd) {
   }
 
   // === ŠTANDARDNÝ ALGORITMUS – percentuálny limit podľa počtu detí (§33 ods. 6) ===
-  // Zoskupíme mesiace podľa počtu oprávnených detí v danom mesiaci
   const months = [];
   for(let m=0;m<12;m++) {
     let count = 0;
@@ -1403,7 +1581,6 @@ function calcBonusDetailed(czd) {
     months.push({ month: m+1, count, rateSum });
   }
 
-  // Unikátne skupiny podľa počtu detí
   const countSet = [...new Set(months.map(m => m.count))].sort((a,b) => a-b);
   let totalBonus = 0;
   let nevyuzity = 0;
@@ -1492,6 +1669,7 @@ function calc5() {
   const celk_poi5 = celk_zp5 + celk_sp5;
   const celk_pred5 = pred1 + pred2;
   const czd_5 = Math.max(0, celk_p5 - celk_poi5);
+  // r.36a = príjmy z dohôd o prácach vykonávaných mimo pracovného pomeru
   const r36a_val = (druh1 === 'dohoda' ? p1 : 0) + (druh2 === 'dohoda' ? p2 : 0);
 
   C.celk_p5 = celk_p5;
@@ -1528,12 +1706,11 @@ function calc() {
   const p_prenajom = v('p_prenajom');
   const v_prenajom = Math.min(v('v_prenajom'), p_prenajom); // výdavky max do výšky príjmov
   const zdravotne = v('zdravotne');
-  const zdravotne_pred = Math.min(v('zdravotne_pred'), v('zdravotne'));
+  const zdravotne_pred = Math.min(v('zdravotne_pred'), v('zdravotne')); // r.14 ≤ r.13
   const socialne = v('socialne');
   const celkove_odvody = zdravotne + socialne;
 
   // Paušálne výdavky: 60% z príjmov, max 20 000 € SPOLU pre §6 ods.1+2 (§6 ods.10)
-  // Spoločný limit zahŕňa živnosť (písm.b), osobitné predpisy (písm.c) aj dielo (ods.2)
   // Výpočty cez Decimal.js pre presnú aritmetiku (žiadne float chyby)
   const pau_zivnost = rv('vydavky_zivnost')==='pausalne';
   const pau_poradca = rv('vydavky_poradca')==='pausalne';
@@ -1553,6 +1730,7 @@ function calc() {
     vydavky_poradca = v('v_poradca_skutocne');
     vydavky_dielo   = v('v_dielo_skutocne');
   }
+  // §6 ods.4 — samostatný limit 20 000 €
   let vydavky_pouzitie = rv('vydavky_pouzitie')==='pausalne' ? N(Decimal.min(D(p_pouzitie).times('0.60'), 20000)) : v('v_pouzitie_skutocne');
 
   // §6 ods.1 + ods.2 → §4b (r.02 + r.03 + r.05 = r.10)
@@ -1565,7 +1743,7 @@ function calc() {
   const celk_vydavky_3 = v_prenajom;
   let czd_6_3 = N(Decimal.max(0, D(celk_prijmy_3).minus(celk_vydavky_3)));
 
-  // §6 ods.4
+  // §6 ods.4 → §4a (r.58-r.65)
   const celk_prijmy_4 = p_pouzitie;
   const celk_vydavky_4 = vydavky_pouzitie;
   let czd_6_4 = N(Decimal.max(0, D(celk_prijmy_4).minus(celk_vydavky_4)));
@@ -1575,11 +1753,14 @@ function calc() {
   const celk_vydavky_34 = N(Decimal.min(celk_prijmy_34, D(celk_vydavky_3).plus(celk_vydavky_4)));
   let czd_6_34 = N(Decimal.max(0, D(celk_prijmy_34).minus(celk_vydavky_34)));
 
+  // Celkové §6
   const celk_prijmy_6 = N(D(celk_prijmy_12).plus(celk_prijmy_34));
   const celk_vydavky_6 = N(D(celk_vydavky_12).plus(celk_vydavky_34));
 
+  // Úhrn aktívnych ZD (§5 + §6 ods.1+2)
   const uhrnZD_aktivny = N(D(czd_5).plus(czd_6));
 
+  // NČZD na daňovníka – počíta sa z úhrnu aktívnych ZD (Decimal.js)
   const NCZD_PLNA = D('5753.79');
   const NCZD_LIMIT = D('25426.27');
   let nczd_dankovnik_suma = 0;
@@ -1597,15 +1778,18 @@ function calc() {
   const nczd_manzel = v('nczd_manzel');
   const celk_nczd = N(D(nczd_dankovnik_suma).plus(iii).plus(nczd_manzel));
 
+  // ——— NČZD sa odpočítava najprv od §5, zvyšok od §6 ods.1+2 (§11 ods.12) ———
   let zd_5_po_nczd = N(Decimal.max(0, D(czd_5).minus(celk_nczd)));
   let nczd_zostatok_pre_6 = N(Decimal.max(0, D(celk_nczd).minus(czd_5)));
   let zd_6_po_nczd = N(Decimal.max(0, D(czd_6).minus(nczd_zostatok_pre_6)));
 
+  // ——— §4 ods.1 písm. a): ZD = §5 po NČZD + §6 ods.3+4 → sadzba 19%/25% (hranica 48 441,43 €) ———
   const PASOM_A = D('48441.43');
   const _zd_a = D(zd_5_po_nczd).plus(czd_6_34);
   const zd_a = N(_zd_a);
   let dan_a = N(R2(_zd_a.lte(PASOM_A) ? _zd_a.times('0.19') : PASOM_A.times('0.19').plus(_zd_a.minus(PASOM_A).times('0.25'))));
 
+  // ——— §4 ods.1 písm. b): ZD = §6 ods.1+2 po NČZD → sadzba 15% ak príjmy ≤ 100 000 €, inak 19%/25% ———
   const _zd_b = D(zd_6_po_nczd);
   const zd_b = N(_zd_b);
   let dan_b;
@@ -1618,7 +1802,11 @@ function calc() {
   const dan = N(R2(D(dan_a).plus(dan_b)));
   const zd_po_nczd = N(D(zd_a).plus(zd_b));
   const sadzba_b = celk_prijmy_12 <= 100000 ? '15%' : '19%/25%';
-  C.sadzba_b = sadzba_b; C.dan_a = dan_a; C.dan_b = dan_b; C.zd_a = zd_a; C.zd_b = zd_b;
+  C.sadzba_b = sadzba_b;
+  C.dan_a = dan_a;
+  C.dan_b = dan_b;
+  C.zd_a = zd_a;
+  C.zd_b = zd_b;
 
   // Daňový bonus – kompletný výpočet podľa §33 ZDP
   // ČZD pre bonus = ČZD §5 + ČZD §6 ods.1+2 (nie §6 ods.3+4)
@@ -1627,6 +1815,7 @@ function calc() {
   const bonus_limit = bonusResult.bonusLimit;
   const bonus = bonusResult.bonus;
   showBonusWarnings(uhrnZD_aktivny, bonusResult);
+
   // ——— r.77 = min(r.72, celk_nczd) - NČZD max do výšky ZD (form.621 vypocet_t77) ———
   const r77_capped = N(Decimal.min(D(uhrnZD_aktivny), D(celk_nczd)));
 
@@ -1636,6 +1825,7 @@ function calc() {
   // ——— r.91 = nevyčerpaná NČZD (ak r.78 = 0) ———
   const r91_val = r78_val === 0 ? N(Decimal.max(0, D(r77_capped).minus(czd_5))) : 0;
 
+  // Výsledná daň
   let dan_po_bonuse = N(Decimal.max(0, D(dan).minus(bonus)));
 
   // ——— r.116 - Daňová povinnosť (17€ prah podľa form.621 inliner116) ———
@@ -1646,18 +1836,54 @@ function calc() {
     r116_val = N(Decimal.max(0, D(dan)));
   }
 
-  // ——— r.118 = max(0, r.116 - bonus) ———
+  // ——— r.116a – základ dane vrátane druhej oprávnenej osoby (§33 ods. 8) ———
+  const r34data = getR34Data();
+  let r116a_val = 0;
+  let r34a_val = 0;
+  if(r34data && r34data.prijem > 0) {
+    r34a_val = r34data.prijem;
+    const czd_38 = czd_5; // r.038 = ČZD §5
+    const czd_45 = czd_6; // r.045 = ČZD §6 ods.1+2
+    const podmienka = czd_38 > 0 || czd_45 > 0;
+    if(r34data.pocetMesiacov === 12 && podmienka) {
+      r116a_val = N(R2(D(r34a_val).plus(czd_38).plus(czd_45)));
+    } else if(r34data.pocetMesiacov > 0 && r34data.pocetMesiacov < 12 && podmienka) {
+      const partnerPomer = N(R2(D(r34a_val).div(12).times(r34data.pocetMesiacov)));
+      r116a_val = N(R2(D(czd_38).plus(czd_45).plus(partnerPomer)));
+    }
+  }
+
+  // ——— r.117 = bonus ———
+  // ——— r.118 = max(0, r.116 - r.117) ———
   const r118_val = r116_val > 0 ? N(Decimal.max(0, D(r116_val).minus(bonus))) : 0;
 
-  // ——— r.124 = max(0, r.118 - r.123), r.123=0 pre bežný prípad ———
-  const r124_val = r116_val > 0 ? r118_val : 0;
+  // ——— r.119 = bonus už vyplatený zamestnávateľom (zatiaľ 0) ———
+  const r119_val = 0;
+  // ——— r.120 = max(0, r.117 - r.119) ———
+  const r120_val = N(Decimal.max(0, D(bonus).minus(r119_val)));
+  // ——— r.121 = max(0, r.120 - r.116) = bonus na vyplatenie ———
+  const r121_val = N(Decimal.max(0, D(r120_val).minus(r116_val)));
 
+  // ——— r.123 = daňový bonus na zaplatené úroky ———
+  const r123_val = C.r35_bonus || 0;
+
+  // ——— r.124 = max(0, r.118 - r.123) ———
+  const r124_val = r116_val > 0 ? N(Decimal.max(0, D(r118_val).minus(r123_val))) : 0;
+
+  // ——— r.125 = 0 (v bežnom prípade) ———
+  // ——— r.126 = max(0, r.123 - r.125) ———
+  const r126_val = r123_val;
+  // ——— r.127 = max(0, r.126 - r.118) = bonus na úroky na vyplatenie ———
+  const r127_val = N(Decimal.max(0, D(r126_val).minus(r118_val)));
+
+  // Zápočet preddavkov §5
   const celk_pred5 = C.celk_pred5 || 0;
   const dan_na_uhradu_raw = N(R2(Decimal.max(0, D(r124_val).minus(celk_pred5))));
   // ——— r.135 - ak ≤5€ tak 0 (form.621 inliner135) ———
   const dan_na_uhradu = dan_na_uhradu_raw <= 5 ? 0 : dan_na_uhradu_raw;
   const preplatok = N(R2(Decimal.max(0, D(celk_pred5).minus(r124_val))));
 
+  // Cache
   Object.assign(C, {
     p_zivnost, p_poradca, p_dielo, p_pouzitie, p_prenajom, v_prenajom,
     celk_prijmy_12, celk_prijmy_3, celk_prijmy_4, celk_prijmy_34, celk_prijmy_6,
@@ -1665,7 +1891,8 @@ function calc() {
     celk_vydavky_12, celk_vydavky_3, celk_vydavky_4, celk_vydavky_34, celk_vydavky_6,
     czd_6, czd_6_3, czd_6_4, czd_6_34, czd_5, uhrnZD_aktivny,
     nczd_dankovnik_suma, iii, nczd_manzel, celk_nczd, r77_capped,
-    r78_val, r91_val, r116_val, r118_val, r124_val,
+    r78_val, r91_val, r116_val, r116a_val, r34a_val, r118_val, r119_val, r120_val, r121_val,
+    r123_val, r124_val, r126_val, r127_val,
     zd_po_nczd, dan, bonus_raw, bonus_limit, bonus,
     dan_po_bonuse, dan_na_uhradu, preplatok,
     zdravotne, zdravotne_pred, socialne
@@ -1680,6 +1907,7 @@ function calc() {
   _d('dot_ods4', p_pouzitie > 0);_s('sum_ods4', p_pouzitie > 0 ? `Príjem: ${fmt(p_pouzitie)}` : '—');
   _d('dot_ods3', p_prenajom > 0);_s('sum_ods3', p_prenajom > 0 ? `Príjem: ${fmt(p_prenajom)}` : '—');
 
+  // Live feedback on §6 page
   const r1 = document.getElementById('vysledok_prijmy');
   if(r1) r1.innerHTML = `
     <div class="computed-row"><span class="computed-label">Príjmy §6 ods.1+2 (r.10)</span><span class="computed-value">${fmt(celk_prijmy_12)}</span></div>
@@ -1694,6 +1922,7 @@ function calc() {
     <div class="computed-row"><span class="computed-label">Príl.4 r.14 – ZP preddavky</span><span class="computed-value">${fmt(zdravotne_pred)}</span></div>
   `;
 
+  // Live feedback on odpočty page
   const r2 = document.getElementById('vysledok_odpcty');
   if(r2) r2.innerHTML = `
     <div class="computed-row"><span class="computed-label">ČZD §5</span><span class="computed-value">${fmt(czd_5)}</span></div>
@@ -1754,16 +1983,31 @@ function buildSummary() {
     <tr><td>r.92</td><td>ZD §4b (§6 ods.1+2 po NČZD) → ${C.sadzba_b}</td><td>${fmt(C.zd_b)}</td></tr>
     <tr><td>r.96</td><td>Daň zo ZD §4b</td><td>${fmt(C.dan_b)}</td></tr>
     <tr><td>r.105</td><td>Daň spolu (r.81 + r.96 + r.90)</td><td>${fmt(C.dan)}</td></tr>
-    <tr><td>r.107</td><td>Daňový bonus na deti</td><td>−${fmt(C.bonus)}</td></tr>
-    <tr><td></td><td>Daň po bonuse</td><td>${fmt(C.dan_po_bonuse)}</td></tr>
-    <tr><td>r.112</td><td>Zrazené preddavky §5</td><td>−${fmt(C.celk_pred5)}</td></tr>
+    ${C.r116a_val > 0 ? `<tr><td>r.116a</td><td>ZD vrátane druhej opr. osoby (§33 ods.8)</td><td>${fmt(C.r116a_val)}</td></tr>` : ''}
+    <tr><td>r.117</td><td>Daňový bonus na deti</td><td>−${fmt(C.bonus)}</td></tr>
+    <tr><td>r.118</td><td>Daň po bonuse</td><td>${fmt(C.r118_val)}</td></tr>
+    ${C.r121_val > 0 ? `<tr><td>r.121</td><td>Bonus na vyplatenie</td><td>${fmt(C.r121_val)}</td></tr>` : ''}
+    ${C.r123_val > 0 ? `
+    <tr class="section-sep"><td colspan="3">Daňový bonus na zaplatené úroky (§33a)</td></tr>
+    <tr><td>r.123</td><td>Bonus na úroky</td><td>−${fmt(C.r123_val)}</td></tr>
+    <tr><td>r.124</td><td>Daň po bonuse a úrokoch</td><td>${fmt(C.r124_val)}</td></tr>
+    ${C.r127_val > 0 ? `<tr><td>r.127</td><td>Bonus na úroky na vyplatenie</td><td>${fmt(C.r127_val)}</td></tr>` : ''}
+    ` : ''}
+    <tr><td>r.131</td><td>Zrazené preddavky §5</td><td>−${fmt(C.celk_pred5)}</td></tr>
     ${C.dan_na_uhradu > 0
       ? `<tr class="total"><td>r.135</td><td><strong>DAŇ NA ÚHRADU</strong></td><td>${fmt(C.dan_na_uhradu)}</td></tr>`
       : `<tr class="total"><td>r.136</td><td><strong>DAŇOVÝ PREPLATOK</strong></td><td>${fmt(C.preplatok)}</td></tr>`
     }
+    ${C.bonus > 0 ? `
+    <tr class="section-sep"><td colspan="3">XI. oddiel – Úhrn príjmov</td></tr>
+    <tr><td>r.146</td><td>Úhrn príjmov (§5 + §6)</td><td>${fmt((C.celk_p5||0) + (C.celk_prijmy_6||0))}</td></tr>
+    <tr><td>r.146a</td><td>z toho zo zdrojov v SR</td><td>${fmt((C.celk_p5||0) + (C.celk_prijmy_6||0))}</td></tr>
+    ${C.r34a_val > 0 ? `<tr><td>r.34a</td><td>Príjem druhej oprávnenej osoby</td><td>${fmt(C.r34a_val)}</td></tr>` : ''}
+    ` : ''}
   `;
   generateXMLPreview();
   drawBurdenChart();
+  showXIV();
 }
 
 // ——— KOLÁČOVÝ GRAF ZAŤAŽENIA ———
@@ -1843,6 +2087,204 @@ function drawBurdenChart() {
   `;
   updateTab1ab();
 }
+// ——— r.34 – DRUHÁ OPRÁVNENÁ OSOBA ———
+function toggleR34() {
+  const enabled = document.getElementById('r34_enabled').checked;
+  document.getElementById('r34_fields').style.display = enabled ? '' : 'none';
+  calc();
+}
+
+function getR34Data() {
+  const enabled = document.getElementById('r34_enabled')?.checked || false;
+  if(!enabled) return null;
+  const meno = (document.getElementById('r34_meno')?.value || '').trim();
+  const rc1 = (document.getElementById('r34_rc1')?.value || '').trim();
+  const rc2 = (document.getElementById('r34_rc2')?.value || '').trim();
+  const mesOd = parseInt(document.getElementById('r34_mesiac_od')?.value) || 1;
+  const mesDo = parseInt(document.getElementById('r34_mesiac_do')?.value) || 12;
+  const typ = document.getElementById('r34_typ_prijmu')?.value || '';
+  const prijem = parseFloat(document.getElementById('r34a_prijem')?.value) || 0;
+  const pocetMesiacov = mesDo - mesOd + 1;
+  const wholeYear = mesOd === 1 && mesDo === 12;
+  return { meno, rc1, rc2, rc: rc1 && rc2 ? rc1+rc2 : '', mesOd, mesDo, typ, prijem, pocetMesiacov, wholeYear,
+    druhaOsobaPodalaDPvSR: typ === 'dpA' || typ === 'dpB',
+    dokladRocZuct: typ === 'rocneZuct',
+    dokladVyskaDane: typ === 'bezDP'
+  };
+}
+
+// ——— r.35 – DAŇOVÝ BONUS NA ZAPLATENÉ ÚROKY ———
+function toggleR35() {
+  const enabled = document.getElementById('r35_enabled').checked;
+  document.getElementById('r35_fields').style.display = enabled ? '' : 'none';
+  calcUroky();
+}
+
+function calcUroky() {
+  const enabled = document.getElementById('r35_enabled')?.checked || false;
+  const TAX_YEAR = 2025;
+  const resEl = document.getElementById('r35_vysledok');
+  const warnEl = document.getElementById('r35_warning');
+
+  if(!enabled) {
+    C.r35_bonus = 0; C.r35_enabled = false;
+    if(resEl) resEl.innerHTML = '';
+    if(warnEl) { warnEl.style.display = 'none'; warnEl.textContent = ''; }
+    calc(); return;
+  }
+  C.r35_enabled = true;
+
+  const datumZmluvyStr = document.getElementById('r35_datum_zmluvy')?.value || '';
+  const datumUroceniaStr = document.getElementById('r35_datum_urocenia')?.value || '';
+  const uroky = parseFloat(document.getElementById('r35_uroky')?.value) || 0;
+  let pocetMesiacov = parseInt(document.getElementById('r35_pocet_mesiacov')?.value) || 12;
+
+  // Automatický výpočet mesiacov z dátumu začiatku úročenia
+  if(datumUroceniaStr) {
+    const dU = new Date(datumUroceniaStr);
+    const rokUrocenia = dU.getFullYear();
+    const mesUrocenia = dU.getMonth() + 1; // 1-12
+    const yearDiff = TAX_YEAR - rokUrocenia;
+    if(yearDiff === 0) {
+      // Prvý rok – od mesiaca začiatku úročenia do decembra
+      pocetMesiacov = 12 - mesUrocenia + 1;
+    } else if(yearDiff === 5) {
+      // Posledný rok – od januára do mesiaca pred začiatkom úročenia
+      pocetMesiacov = mesUrocenia - 1;
+    } else if(yearDiff > 0 && yearDiff < 5) {
+      pocetMesiacov = 12;
+    } else {
+      pocetMesiacov = 0;
+    }
+    const mesEl = document.getElementById('r35_pocet_mesiacov');
+    if(mesEl) mesEl.value = pocetMesiacov;
+  }
+
+  // Limit podľa roku zmluvy
+  const rokZmluvy = datumZmluvyStr ? new Date(datumZmluvyStr).getFullYear() : 0;
+  const rocnyLimit = rokZmluvy >= 2024 ? 1200 : 400;
+
+  // Výpočet: 50% zaplatených úrokov, max ročný limit (pomerná časť ak nie celý rok)
+  let bonus = 0;
+  if(pocetMesiacov > 0 && uroky > 0) {
+    if(pocetMesiacov === 12) {
+      bonus = Math.min(uroky * 0.5, rocnyLimit);
+    } else {
+      // Pomerná časť
+      const raw = uroky * 0.5;
+      const rawPerMonth = Math.round(raw / 12 * 100) / 100;
+      const limitPerMonth = Math.round(rocnyLimit / 12 * 100) / 100;
+      bonus = Math.min(rawPerMonth * pocetMesiacov, limitPerMonth * pocetMesiacov);
+    }
+    bonus = Math.round(bonus * 100) / 100;
+  }
+
+  // Validácia 5-ročného okna
+  if(warnEl) {
+    if(datumUroceniaStr) {
+      const rokUrocenia = new Date(datumUroceniaStr).getFullYear();
+      const diff = TAX_YEAR - rokUrocenia;
+      if(diff > 5) {
+        warnEl.textContent = `Úročenie začalo v roku ${rokUrocenia} – uplynulo viac ako 5 rokov. Nárok na bonus zanikol.`;
+        warnEl.style.display = '';
+        bonus = 0;
+      } else if(diff < 0) {
+        warnEl.textContent = 'Dátum začiatku úročenia je v budúcnosti.';
+        warnEl.style.display = '';
+        bonus = 0;
+      } else {
+        warnEl.style.display = 'none';
+      }
+    } else {
+      warnEl.style.display = 'none';
+    }
+  }
+
+  C.r35_bonus = bonus;
+  C.r35_uroky = uroky;
+  C.r35_pocet_mesiacov = pocetMesiacov;
+
+  if(resEl && bonus > 0) {
+    resEl.innerHTML = `
+      <div class="computed-row"><span class="computed-label">50 % zaplatených úrokov</span><span class="computed-value">${fmt(uroky * 0.5)}</span></div>
+      <div class="computed-row"><span class="computed-label">Ročný limit (${rocnyLimit} €${pocetMesiacov < 12 ? ', '+pocetMesiacov+' mes.' : ''})</span><span class="computed-value">${fmt(pocetMesiacov < 12 ? Math.round(rocnyLimit/12*100)/100*pocetMesiacov : rocnyLimit)}</span></div>
+      <div class="computed-row"><span class="computed-label">Daňový bonus na úroky (r.123)</span><span class="computed-value highlight">${fmt(bonus)}</span></div>
+    `;
+  } else if(resEl) {
+    resEl.innerHTML = '';
+  }
+  calc();
+}
+
+// ——— IBAN formátovanie ———
+function formatIBAN(el) {
+  el.value = el.value.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
+}
+
+// ——— XIV. ODDIEL – zobrazenie a aktualizácia ———
+function showXIV() {
+  const sec = document.getElementById('section_xiv');
+  if(!sec) return;
+  const bonusNaVyplatenie = (C.r121_val || 0) > 0; // r.121 > 0
+  const bonusUrokyNaVyplatenie = (C.r127_val || 0) > 0; // r.127 > 0
+  const maPreplatok = (C.preplatok || 0) > 0;
+  const zobrazit = bonusNaVyplatenie || maPreplatok || bonusUrokyNaVyplatenie;
+  sec.style.display = zobrazit ? '' : 'none';
+
+  const infoEl = document.getElementById('xiv_info_box');
+  const bonusWrap = document.getElementById('xiv_bonus_wrap');
+  const preplatokWrap = document.getElementById('xiv_preplatok_wrap');
+
+  if(bonusWrap) bonusWrap.style.display = bonusNaVyplatenie ? 'flex' : 'none';
+  if(preplatokWrap) preplatokWrap.style.display = maPreplatok ? 'flex' : 'none';
+
+  // Dynamicky pridať/odobrať checkbox pre bonus na úroky
+  let urokyWrap = document.getElementById('xiv_uroky_wrap');
+  if(bonusUrokyNaVyplatenie && !urokyWrap) {
+    const div = document.createElement('div');
+    div.id = 'xiv_uroky_wrap';
+    div.style.cssText = 'margin-bottom:8px;padding:10px 14px;background:#f0f0fa;border:1px solid #c8c8e8;border-radius:8px;display:flex;align-items:center;gap:10px;';
+    div.innerHTML = `<input type="checkbox" id="xiv_vyplatit_uroky" checked style="width:16px;height:16px;accent-color:#321941;" onchange="updateXIV()">
+      <label for="xiv_vyplatit_uroky" style="font-size:13px;color:#3a3a6a;margin:0;cursor:pointer;">Žiadam o <strong>vyplatenie daňového bonusu na zaplatené úroky</strong> (r.127: ${fmt(C.r127_val)})</label>`;
+    document.getElementById('xiv_checkboxes').appendChild(div);
+  } else if(!bonusUrokyNaVyplatenie && urokyWrap) {
+    urokyWrap.remove();
+  }
+
+  let items = [];
+  if(bonusNaVyplatenie) items.push(`<strong>daňový bonus</strong> (${fmt(C.r121_val)})`);
+  if(bonusUrokyNaVyplatenie) items.push(`<strong>bonus na úroky</strong> (${fmt(C.r127_val)})`);
+  if(maPreplatok) items.push(`<strong>daňový preplatok</strong> (${fmt(C.preplatok)})`);
+  const infoText = items.length > 0
+    ? `Máte nárok na vyplatenie/vrátenie: ${items.join(', ')}. Vyplňte IBAN pre poukázanie na účet.`
+    : '';
+  if(infoEl) infoEl.innerHTML = infoText;
+
+  // Nastaviť dátum na dnes ak prázdny
+  const datumEl = document.getElementById('xiv_datum');
+  if(datumEl && !datumEl.value) {
+    const d = new Date();
+    datumEl.value = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  }
+  updateXIV();
+}
+
+function updateXIV() {
+  const statusEl = document.getElementById('xiv_status');
+  if(!statusEl) return;
+  const iban = (document.getElementById('xiv_iban')?.value || '').trim();
+  const datum = (document.getElementById('xiv_datum')?.value || '').trim();
+  const vyplatitBonus = document.getElementById('xiv_vyplatit_bonus')?.checked || false;
+  const vratitPreplatok = document.getElementById('xiv_vratit_preplatok')?.checked || false;
+  if((vyplatitBonus || vratitPreplatok) && !iban) {
+    statusEl.innerHTML = '<div class="warn-box">Vyplňte IBAN pre poukázanie na bankový účet.</div>';
+  } else if(iban && iban.length < 24) {
+    statusEl.innerHTML = '<div class="warn-box">IBAN musí mať minimálne 24 znakov (SK + 22 číslic).</div>';
+  } else {
+    statusEl.innerHTML = '';
+  }
+}
+
 function calcAsig() {
   const perc = parseFloat(document.getElementById('asig_percento').value) || 0;
   const el = document.getElementById('asig_vysledok');
@@ -1888,10 +2330,9 @@ function buildChildXml() {
     const rc1 = (document.getElementById(`d${d}_rc1`)?.value || '').trim();
     const rc2 = (document.getElementById(`d${d}_rc2`)?.value || '').trim();
     const vek = document.getElementById(`d${d}_vek`)?.value || '';
-    if(!meno && !rc1) continue; // skip empty child
-    if(childState[d].blocked) continue; // skip blocked child
+    if(!meno && !rc1) continue;
+    if(childState[d].blocked) continue;
     const rc = rc1 && rc2 ? rc1 + rc2 : '';
-    // Mesačné checkboxy
     let monthsArr = [];
     let anyMonth = false;
     for(let m=1;m<=12;m++) {
@@ -1900,15 +2341,18 @@ function buildChildXml() {
       if(checked) anyMonth = true;
     }
     if(!anyMonth && !meno) continue;
-    // m00 = sadzba: 1=100€(do15), 2=50€(15-18)
-    const m00 = vek === 'do6' ? 1 : (vek === '6_15' || vek === '15_18') ? 2 : 0; // 1=do15, 2=15-18
+    // m00 = "celý rok" (1-12) – ak je zaškrtnuté 1-12, m00=1 a jednotlivé mesiace=0
+    // Podľa validácie: "ak je zaškrtnuté pole 1-12, nemôžu byť súčasne zaškrtnuté ostatné polia jednotlivých mesiacov a naopak"
+    const allMonthsChecked = document.getElementById(`d${d}_m0`)?.checked || false;
+    const m00 = (allMonthsChecked && monthsArr.every(v => v === 1)) ? 1 : 0;
     xml += `\t\t<dieta>\n`;
     xml += `\t\t\t<priezviskoMeno>${esc(meno)}</priezviskoMeno>\n`;
     xml += `\t\t\t<rodneCislo>${esc(rc)}</rodneCislo>\n`;
     xml += `\t\t\t<m00>${m00}</m00>\n`;
     xml += `\t\t\t`;
     for(let m=1;m<=12;m++) {
-      xml += `<m${String(m).padStart(2,'0')}>${monthsArr[m-1]}</m${String(m).padStart(2,'0')}>`;
+      // Ak m00=1 (celý rok), jednotlivé mesiace musia byť 0
+      xml += `<m${String(m).padStart(2,'0')}>${m00 ? 0 : monthsArr[m-1]}</m${String(m).padStart(2,'0')}>`;
     }
     xml += `\n\t\t</dieta>\n`;
   }
@@ -1963,7 +2407,6 @@ function buildXML() {
   const pausalne_12 = (pausalne_zivnost || pausalne_poradca || pausalne_dielo) ? 1 : 0;
   const pausalne = (pausalne_12 || pausalne_pouzitie) ? 1 : 0;
 
-  // Výdavky paušál pre tabulka1b (60% zo živnosti + poradca + dielo)
   const raw12 = (pausalne_zivnost ? C.p_zivnost*0.60 : 0) + (pausalne_poradca ? C.p_poradca*0.60 : 0) + (pausalne_dielo ? C.p_dielo*0.60 : 0);
   const cap12 = Math.min(raw12, 20000);
   const vydPauZivnost  = pausalne_zivnost && raw12 > 0 ? cap12 * (C.p_zivnost*0.60 / raw12) : 0;
@@ -2053,24 +2496,50 @@ function buildXML() {
 ${buildChildXml()}
 \t</r33>
 \t<r33a>${n2z(C.bonus)}</r33a>
-\t<uplatnujemPar33Ods8>${C.bonus > 0 ? 1 : 0}</uplatnujemPar33Ods8>
+\t<uplatnujemPar33Ods8>${(() => { const d = getR34Data(); return d ? 1 : 0; })()}</uplatnujemPar33Ods8>
 \t<r34>
-\t\t<priezviskoMeno></priezviskoMeno>
+${(() => {
+  const d = getR34Data();
+  if(!d) return `\t\t<priezviskoMeno></priezviskoMeno>
 \t\t<rodneCislo></rodneCislo>
 \t\t<m00>0</m00><m01>0</m01><m02>0</m02><m03>0</m03><m04>0</m04>
 \t\t<m05>0</m05><m06>0</m06><m07>0</m07><m08>0</m08><m09>0</m09>
 \t\t<m10>0</m10><m11>0</m11><m12>0</m12>
 \t\t<druhaOsobaPodalaDPvSR>0</druhaOsobaPodalaDPvSR>
 \t\t<dokladRocZuct>0</dokladRocZuct>
-\t\t<dokladVyskaDane>0</dokladVyskaDane>
+\t\t<dokladVyskaDane>0</dokladVyskaDane>`;
+  const m00 = d.wholeYear ? 1 : 0;
+  let months = '';
+  for(let m=1;m<=12;m++) {
+    const inRange = !d.wholeYear && m >= d.mesOd && m <= d.mesDo;
+    months += `<m${String(m).padStart(2,'0')}>${m00 ? 0 : (inRange ? 1 : 0)}</m${String(m).padStart(2,'0')}>`;
+  }
+  return `\t\t<priezviskoMeno>${esc(d.meno)}</priezviskoMeno>
+\t\t<rodneCislo>${esc(d.rc)}</rodneCislo>
+\t\t<m00>${m00}</m00>${months}
+\t\t<druhaOsobaPodalaDPvSR>${d.druhaOsobaPodalaDPvSR ? 1 : 0}</druhaOsobaPodalaDPvSR>
+\t\t<dokladRocZuct>${d.dokladRocZuct ? 1 : 0}</dokladRocZuct>
+\t\t<dokladVyskaDane>${d.dokladVyskaDane ? 1 : 0}</dokladVyskaDane>`;
+})()}
 \t</r34>
-\t<r34a></r34a>
+\t<r34a>${C.r34a_val > 0 ? n2(C.r34a_val) : ''}</r34a>
 \t<r35>
-\t<uplatDanBonusZaplatUroky>0</uplatDanBonusZaplatUroky>
+${(() => {
+  const enabled = C.r35_enabled || false;
+  if(!enabled) return `\t<uplatDanBonusZaplatUroky>0</uplatDanBonusZaplatUroky>
 \t<zaplateneUroky></zaplateneUroky>
 \t<pocetMesiacov></pocetMesiacov>
 \t<datumZacatiaUroceniaUveru></datumZacatiaUroceniaUveru>
-\t<datumUzavretiaZmluvyOUvere></datumUzavretiaZmluvyOUvere>
+\t<datumUzavretiaZmluvyOUvere></datumUzavretiaZmluvyOUvere>`;
+  const dz = document.getElementById('r35_datum_zmluvy')?.value || '';
+  const du = document.getElementById('r35_datum_urocenia')?.value || '';
+  const fmtD = s => { if(!s) return ''; const p=s.split('-'); return p[2]+'.'+p[1]+'.'+p[0]; };
+  return `\t<uplatDanBonusZaplatUroky>1</uplatDanBonusZaplatUroky>
+\t<zaplateneUroky>${n2(C.r35_uroky||0)}</zaplateneUroky>
+\t<pocetMesiacov>${C.r35_pocet_mesiacov||0}</pocetMesiacov>
+\t<datumZacatiaUroceniaUveru>${fmtD(du)}</datumZacatiaUroceniaUveru>
+\t<datumUzavretiaZmluvyOUvere>${fmtD(dz)}</datumUzavretiaZmluvyOUvere>`;
+})()}
 \t</r35>
 \t<r36>${r36}</r36>
 \t<r36a>${r36a}</r36a>
@@ -2088,9 +2557,9 @@ ${buildChildXml()}
 \t\t</t1r3>
 \t\t<t1r4><s1></s1><s2></s2></t1r4>
 \t\t<t1r5>
-			<s1>${C.p_dielo > 0 ? n2(C.p_dielo) : ''}</s1>
-			<s2>${C.p_dielo > 0 ? n2(C.vydavky_dielo) : ''}</s2>
-		</t1r5>
+\t\t\t<s1>${C.p_dielo > 0 ? n2(C.p_dielo) : ''}</s1>
+\t\t\t<s2>${C.p_dielo > 0 ? n2(C.vydavky_dielo) : ''}</s2>
+\t\t</t1r5>
 \t\t<t1r6><s1></s1><s2></s2></t1r6>
 \t\t<t1r7><s1></s1><s2></s2></t1r7>
 \t\t<t1r8><s1></s1><s2></s2></t1r8>
@@ -2196,20 +2665,25 @@ ${buildChildXml()}
 \t<r96>${n2(C.dan_b)}</r96>
 \t<r97></r97><r98></r98><r99></r99>
 \t<r100></r100><r101></r101><r102></r102><r103></r103><r104></r104>
-\t<r105>${n2(C.dan_b)}</r105>
+\t<r105>${n2(C.dan)}</r105>
 \t<r106></r106>
-\t<r107>${C.bonus > 0 ? n2(C.bonus) : ''}</r107>
+\t<r107></r107>
 \t<r108></r108><r109></r109><r110></r110><r111></r111>
 \t<r112></r112><r113></r113><r114></r114><r115></r115>
 \t<r116>${C.r116_val > 0 ? n2(C.r116_val) : ''}</r116>
-\t<r116a></r116a>
+\t<r116a>${C.r116a_val > 0 ? n2(C.r116a_val) : ''}</r116a>
 \t<r117>${C.bonus > 0 ? n2(C.bonus) : ''}</r117>
 \t<r118>${C.r118_val > 0 ? n2(C.r118_val) : ''}</r118>
-\t<r119></r119><r120></r120>
-\t<r121>${C.bonus > C.dan ? n2(C.bonus - C.dan) : ''}</r121>
-\t<r122></r122><r123></r123>
+\t<r119></r119>
+\t<r120>${C.r120_val > 0 ? n2(C.r120_val) : ''}</r120>
+\t<r121>${C.r121_val > 0 ? n2(C.r121_val) : ''}</r121>
+\t<r122></r122>
+\t<r123>${C.r123_val > 0 ? n2(C.r123_val) : ''}</r123>
 \t<r124>${C.r124_val > 0 ? n2(C.r124_val) : ''}</r124>
-\t<r125></r125><r126></r126><r127></r127><r128></r128>
+\t<r125></r125>
+\t<r126>${C.r126_val > 0 ? n2(C.r126_val) : ''}</r126>
+\t<r127>${C.r127_val > 0 ? n2(C.r127_val) : ''}</r127>
+\t<r128></r128>
 \t<r129></r129><r130></r130>
 \t<r131>${C.celk_pred5 > 0 ? n2(C.celk_pred5) : ''}</r131>
 \t<r132></r132><r133></r133><r134></r134>
@@ -2217,7 +2691,9 @@ ${buildChildXml()}
 \t<r136>${C.preplatok > 0 ? n2(C.preplatok) : ''}</r136>
 \t<r137></r137><r138></r138><r139></r139><r140></r140>
 \t<r141></r141><r142></r142><r143></r143><r144></r144>
-\t<r145></r145><r146></r146><r146a></r146a>
+\t<r145></r145>
+\t<r146>${C.bonus > 0 ? n2((C.celk_p5||0) + (C.celk_prijmy_6||0)) : ''}</r146>
+\t<r146a>${C.bonus > 0 ? n2((C.celk_p5||0) + (C.celk_prijmy_6||0)) : ''}</r146a>
 \t<r147></r147><r148></r148>
 \t<r149>0</r149><r150></r150>
 \t<r151>
@@ -2248,12 +2724,12 @@ ${buildChildXml()}
 \t<r154>${r154}</r154>
 \t<datumVyhlasenia>${datumVyhl}</datumVyhlasenia>
 \t<danovyPreplatokBonus>
-\t\t<vyplatitDanovyBonus>0</vyplatitDanovyBonus>
-\t\t<vyplatitDanovyBonusUroky>0</vyplatitDanovyBonusUroky>
-\t\t<vratitDanPreplatok>0</vratitDanPreplatok>
-\t\t<sposobPlatby><poukazka>0</poukazka><ucet>0</ucet><ucetZahranicie>0</ucetZahranicie></sposobPlatby>
-\t\t<bankovyUcet><IBAN></IBAN></bankovyUcet>
-\t\t<datum></datum>
+\t\t<vyplatitDanovyBonus>${(document.getElementById('xiv_vyplatit_bonus')?.checked && C.bonus > C.dan) ? 1 : 0}</vyplatitDanovyBonus>
+\t\t<vyplatitDanovyBonusUroky>${(document.getElementById('xiv_vyplatit_uroky')?.checked && C.r127_val > 0) ? 1 : 0}</vyplatitDanovyBonusUroky>
+\t\t<vratitDanPreplatok>${(document.getElementById('xiv_vratit_preplatok')?.checked && C.preplatok > 0) ? 1 : 0}</vratitDanPreplatok>
+\t\t<sposobPlatby><poukazka>0</poukazka><ucet>${(document.getElementById('xiv_iban')?.value||'').trim().length >= 24 ? 1 : 0}</ucet><ucetZahranicie>0</ucetZahranicie></sposobPlatby>
+\t\t<bankovyUcet><IBAN>${esc((document.getElementById('xiv_iban')?.value||'').trim())}</IBAN></bankovyUcet>
+\t\t<datum>${(() => { const d = document.getElementById('xiv_datum')?.value; if(!d) return ''; const p = d.split('-'); return p[2]+'.'+p[1]+'.'+p[0]; })()}</datum>
 \t</danovyPreplatokBonus>
 \t<pril2PodielyNaZisku>
 \t\t<pr1></pr1><pr2></pr2><pr3></pr3>
@@ -2371,7 +2847,6 @@ async function generatePDF() {
     ...(C.czd_6_34 > 0 ? [
     ['ČZD §6 ods.3+4 (r.60)',fmt(C.czd_6_34),true],
     ] : []),
-
     ['NEZDANITEĽNÉ ČASTI (§11)','',true],
     ['NČZD na daňovníka (r.73)',fmt(C.nczd_dankovnik_suma),false],
     ['NČZD na manžela/ku (r.74)',fmt(C.nczd_manzel),false],
@@ -2513,6 +2988,80 @@ async function generatePDF() {
   }
 }
 
+// ══════════════════════════════════════════════
+// ── NGO autocomplete for §50 ──
+let ngoData = null;
+let ngoLoadPromise = null;
+function loadNgoData() {
+  if (ngoData) return Promise.resolve(ngoData);
+  if (ngoLoadPromise) return ngoLoadPromise;
+  ngoLoadPromise = fetch('Public/ngos.json')
+    .then(r => r.json())
+    .then(function(arr) { ngoData = arr.map(function(e) { return { ico: e[0], nazov: e[1], obec: e[2] }; }); return ngoData; })
+    .catch(function() { ngoData = []; return ngoData; });
+  return ngoLoadPromise;
+}
+function searchNgo(query, limit) {
+  if (!ngoData || !query || query.length < 2) return [];
+  limit = limit || 15;
+  var q = query.toLowerCase();
+  var exact = [], partial = [];
+  for (var i = 0; i < ngoData.length && (exact.length + partial.length) < limit * 2; i++) {
+    var n = ngoData[i];
+    var name = n.nazov.toLowerCase(), ico = n.ico;
+    if (ico === q || name === q) exact.push(n);
+    else if (ico.indexOf(q) === 0 || name.indexOf(q) !== -1) partial.push(n);
+  }
+  return exact.concat(partial).slice(0, limit);
+}
+(function initNgoAutocomplete() {
+  var searchInp = document.getElementById('ngoSearch');
+  var listEl = document.getElementById('ngoAutocompleteList');
+  var infoEl = document.getElementById('ngoSelectedInfo');
+  var icoInp = document.getElementById('asig_ico');
+  var menoInp = document.getElementById('asig_nazov');
+  if (!searchInp || !listEl) return;
+  var esc = function(s) { var d = document.createElement('div'); d.textContent = s; return d.innerHTML; };
+  function selectNgo(ngo) {
+    icoInp.value = ngo.ico;
+    menoInp.value = ngo.nazov;
+    searchInp.value = '';
+    listEl.classList.remove('open');
+    infoEl.textContent = ngo.nazov + ', ' + ngo.obec + ' (IČO: ' + ngo.ico + ')';
+    infoEl.style.display = 'block';
+    calcAsig();
+  }
+  function renderNgoResults(results) {
+    if (!results.length) { listEl.innerHTML = '<div style="padding:10px 12px;color:var(--muted);font-size:13px">Žiadne výsledky</div>'; listEl.classList.add('open'); return; }
+    var h = '';
+    results.forEach(function(n) {
+      h += '<div class="ngo-autocomplete-item" data-ico="'+esc(n.ico)+'" data-nazov="'+esc(n.nazov)+'" data-obec="'+esc(n.obec)+'">';
+      h += '<div><span class="ngo-name">'+esc(n.nazov)+'</span>';
+      h += '<br><span class="ngo-obec">'+esc(n.obec)+'</span></div>';
+      h += '<span class="ngo-ico">IČO: '+esc(n.ico)+'</span></div>';
+    });
+    listEl.innerHTML = h;
+    listEl.classList.add('open');
+    listEl.querySelectorAll('.ngo-autocomplete-item').forEach(function(el) {
+      el.addEventListener('mousedown', function(e) {
+        e.preventDefault();
+        selectNgo({ ico: this.dataset.ico, nazov: this.dataset.nazov, obec: this.dataset.obec });
+      });
+    });
+  }
+  var searchTimeout = null;
+  searchInp.addEventListener('focus', function() { loadNgoData(); });
+  searchInp.addEventListener('input', function() {
+    var val = this.value.trim();
+    clearTimeout(searchTimeout);
+    if (val.length < 2) { listEl.classList.remove('open'); return; }
+    searchTimeout = setTimeout(function() { renderNgoResults(searchNgo(val)); }, 150);
+  });
+  searchInp.addEventListener('blur', function() { setTimeout(function() { listEl.classList.remove('open'); }, 200); });
+})();
+
+// Init
+calc5(); calc();
 </script>
 </body>
 </html>

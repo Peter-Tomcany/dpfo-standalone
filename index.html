@@ -2996,7 +2996,8 @@ function loadNgoData() {
   if (ngoData) return Promise.resolve(ngoData);
   if (ngoLoadPromise) return ngoLoadPromise;
   ngoLoadPromise = fetch('Public/ngos.json')
-    .then(r => r.json())
+    .then(function(r) { if (!r.ok) return fetch('web/Public/ngos.json'); return r; })
+    .then(function(r) { return r.json(); })
     .then(function(arr) { ngoData = arr.map(function(e) { return { ico: e[0], nazov: e[1], obec: e[2] }; }); return ngoData; })
     .catch(function() { ngoData = []; return ngoData; });
   return ngoLoadPromise;
@@ -3061,6 +3062,7 @@ function searchNgo(query, limit) {
 })();
 
 // Init
+validateChildBonus(1); validateChildBonus(2);
 calc5(); calc();
 </script>
 </body>

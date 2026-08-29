@@ -1,0 +1,22 @@
+# Klientske data - NIKDY necommitovat (bezpecnostny audit 29. 8. 2026)
+*.xlsx
+*.xlsm
+*.xls
+*.pdf
+*.eml
+DPFO_*.xml
+DPPO_*.xml
+*_output.xml
+*priznanie*.xml
+
+# Prostredie a tajomstva
+.env
+.env.*
+!.env.example
+
+# System
+__pycache__/
+*.pyc
+node_modules/
+.DS_Store
+Thumbs.db
